@@ -9,64 +9,58 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function PricingPage() {
 	const plans = [
 		{
-			name: "Starter",
+			name: "Free",
 			price: "$0",
 			billing: "Forever",
-			description: "Perfect for individuals getting started with productivity tools",
+			description: "Perfect for getting started with your first accountability goal",
 			features: [
-				"Up to 3 projects",
-				"Basic task management",
-				"5GB file storage",
-				"Email support",
-				"Mobile app access",
+				"1 accountability project",
+				"Connect with 1 accountability buddy",
+				"Progress tracking and action log",
+				"Basic milestone celebrations",
+				"Community support",
 			],
 			limitations: [
-				"No team collaboration",
+				"Limited to 1 project",
+				"No priority features",
 				"No advanced analytics",
-				"No integrations",
-				"No priority support",
 			],
 			recommended: false,
 			buttonText: "Get Started Free",
 		},
 		{
-			name: "Professional",
-			price: "$12",
+			name: "Premium",
+			price: "$9",
 			billing: "per month",
-			description: "Ideal for professionals and small teams who need more power",
+			description: "Unlock unlimited accountability projects and advanced features",
 			features: [
-				"Unlimited projects",
-				"Advanced task management",
-				"50GB file storage",
-				"Team collaboration (up to 10 members)",
-				"Priority email support",
-				"Integrations with popular tools",
-				"Advanced analytics",
-				"Custom workflows",
+				"Unlimited accountability projects",
+				"Connect with multiple buddies",
+				"Advanced progress analytics",
+				"Custom milestone tracking",
+				"Priority support",
+				"Goal achievement insights",
+				"Weekly accountability reports",
+				"Mobile notifications",
 			],
-			limitations: [
-				"Limited to 10 team members",
-				"No white-label options",
-			],
+			limitations: [],
 			recommended: true,
-			buttonText: "Start Free Trial",
+			buttonText: "Start Premium",
 		},
 		{
-			name: "Enterprise",
-			price: "Custom",
-			billing: "Contact us",
-			description: "Perfect for large organizations with advanced needs",
+			name: "Team",
+			price: "$25",
+			billing: "per month",
+			description: "Perfect for organizations promoting accountability culture",
 			features: [
-				"Everything in Professional",
-				"Unlimited team members",
-				"500GB file storage",
-				"24/7 phone & chat support",
-				"Custom integrations",
-				"White-label options",
-				"Advanced security features",
-				"Dedicated account manager",
-				"Custom onboarding",
-				"SLA guarantee",
+				"Everything in Premium",
+				"Team accountability dashboard",
+				"Up to 10 team members",
+				"Group goal tracking",
+				"Team analytics and insights",
+				"Admin management tools",
+				"Custom branding options",
+				"Dedicated account support",
 			],
 			limitations: [],
 			recommended: false,
@@ -76,28 +70,28 @@ export default function PricingPage() {
 
 	const faqs = [
 		{
-			question: "Can I change my plan at any time?",
-			answer: "Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle, and we'll prorate any differences.",
+			question: "How does the accountability buddy system work?",
+			answer: "You invite friends, family, or colleagues by email to be your accountability buddies. They can see your progress, encourage you, and help keep you motivated to reach your goals.",
 		},
 		{
-			question: "Is there a free trial?",
-			answer: "Yes! We offer a 14-day free trial for the Professional plan. No credit card required to start your trial.",
+			question: "Can I have multiple accountability projects?",
+			answer: "Free users can create 1 project, while Premium users get unlimited projects. This lets you work on multiple goals simultaneously with different accountability buddies.",
 		},
 		{
-			question: "What happens if I exceed my plan limits?",
-			answer: "We'll notify you when you're approaching your limits. You can upgrade your plan or we'll help you optimize your usage.",
+			question: "What if my buddy doesn't respond?",
+			answer: "You can always invite new buddies to your projects. We also provide community support and gentle reminders to keep everyone engaged in the accountability process.",
 		},
 		{
-			question: "Do you offer discounts for annual billing?",
-			answer: "Yes, we offer 2 months free when you pay annually. That's a 17% discount compared to monthly billing.",
+			question: "Is my progress data private?",
+			answer: "Yes! Your progress is only visible to you and the accountability buddies you specifically invite to each project. We take privacy seriously.",
 		},
 		{
-			question: "What payment methods do you accept?",
-			answer: "We accept all major credit cards, PayPal, and wire transfers for Enterprise customers. All payments are processed securely.",
+			question: "Can I upgrade from Free to Premium anytime?",
+			answer: "Absolutely! You can upgrade to Premium at any time to unlock unlimited projects and advanced features. Your existing project and data will remain intact.",
 		},
 		{
-			question: "Can I cancel anytime?",
-			answer: "Absolutely. You can cancel your subscription at any time. Your account will remain active until the end of your current billing period.",
+			question: "Do you offer refunds?",
+			answer: "Yes, we offer a 30-day money-back guarantee for Premium subscriptions. If you're not satisfied, we'll provide a full refund within 30 days.",
 		},
 	] as const;
 
@@ -105,10 +99,10 @@ export default function PricingPage() {
 		<div className="container mx-auto max-w-6xl px-4 py-8">
 			{/* Header Section */}
 			<section className="text-center space-y-4 py-16">
-				<h1 className="text-4xl font-bold tracking-tight lg:text-6xl">Simple, Transparent Pricing</h1>
+				<h1 className="text-4xl font-bold tracking-tight lg:text-6xl">Achieve More With Accountability</h1>
 				<p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-					Choose the plan that's right for you. Start free, then scale as you grow. 
-					All plans include our core features and 24/7 support.
+					Start with one free project, then upgrade to unlock unlimited accountability goals. 
+					All plans include buddy connections and progress tracking.
 				</p>
 			</section>
 
@@ -212,33 +206,33 @@ export default function PricingPage() {
 
 			{/* Features Comparison */}
 			<section className="py-16">
-				<h2 className="text-3xl font-bold text-center mb-12">All Plans Include</h2>
+				<h2 className="text-3xl font-bold text-center mb-12">Core Accountability Features</h2>
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
 					<div className="text-center space-y-3">
 						<div className="h-12 w-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
 							<Check className="h-6 w-6 text-primary" />
 						</div>
-						<h3 className="font-semibold">99.9% Uptime SLA</h3>
+						<h3 className="font-semibold">Buddy Connections</h3>
 						<p className="text-sm text-muted-foreground">
-							Reliable service you can count on with minimal downtime.
+							Invite friends, family, or colleagues to keep you accountable.
 						</p>
 					</div>
 					<div className="text-center space-y-3">
 						<div className="h-12 w-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
 							<Check className="h-6 w-6 text-primary" />
 						</div>
-						<h3 className="font-semibold">Data Security</h3>
+						<h3 className="font-semibold">Progress Tracking</h3>
 						<p className="text-sm text-muted-foreground">
-							Enterprise-grade security with encryption and regular backups.
+							Log updates, milestones, and challenges with detailed timelines.
 						</p>
 					</div>
 					<div className="text-center space-y-3">
 						<div className="h-12 w-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
 							<Check className="h-6 w-6 text-primary" />
 						</div>
-						<h3 className="font-semibold">Regular Updates</h3>
+						<h3 className="font-semibold">Goal Achievement</h3>
 						<p className="text-sm text-muted-foreground">
-							Continuous improvements and new features at no extra cost.
+							Stay motivated with milestone celebrations and achievement insights.
 						</p>
 					</div>
 				</div>
@@ -262,7 +256,7 @@ export default function PricingPage() {
 				<div className="space-y-6 max-w-2xl mx-auto">
 					<h2 className="text-3xl font-bold">30-Day Money-Back Guarantee</h2>
 					<p className="text-muted-foreground text-lg">
-						Try Purple risk-free. If you're not completely satisfied within the first 30 days, 
+						Try Premium risk-free. If you haven't achieved better accountability results within 30 days, 
 						we'll refund your money, no questions asked.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -277,12 +271,12 @@ export default function PricingPage() {
 						<Unauthenticated>
 							<SignUpButton mode="modal">
 								<Button size="lg">
-									Start Free Trial
+									Start Your First Project
 									<ArrowRight className="ml-2 h-4 w-4" />
 								</Button>
 							</SignUpButton>
 							<Button variant="outline" size="lg" asChild>
-								<Link href="/about">Learn More About Us</Link>
+								<Link href="/about">Learn More</Link>
 							</Button>
 						</Unauthenticated>
 					</div>
