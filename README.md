@@ -1,17 +1,15 @@
-# purple
+# get-poor
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Convex, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, Convex, and more.
 
 ## Features
 
 - **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
+- **TanStack Start** - SSR framework with TanStack Router
 - **TailwindCSS** - Utility-first CSS for rapid UI development
 - **shadcn/ui** - Reusable UI components
 - **Convex** - Reactive backend-as-a-service platform
-- **Authentication** - Clerk
 - **Turborepo** - Optimized monorepo build system
-- **Biome** - Linting and formatting
 
 ## Getting Started
 
@@ -29,7 +27,7 @@ This project uses Convex as a backend. You'll need to set up Convex before runni
 bun dev:setup
 ```
 
-Follow the prompts to create a new Convex project and connect it to your application. See [Convex + Clerk guide](https://docs.convex.dev/auth/clerk) for auth setup.
+Follow the prompts to create a new Convex project and connect it to your application.
 
 Then, run the development server:
 
@@ -42,18 +40,14 @@ Your app will connect to the Convex cloud backend automatically.
 
 
 
-
-
 ## Project Structure
 
 ```
-purple/
+get-poor/
 ├── apps/
-│   ├── web/         # Frontend application (Next.js)
+│   ├── web/         # Frontend application (React + TanStack Start)
 ├── packages/
 │   └── backend/     # Convex backend functions and schema
-│       ├── convex/    # Convex functions and schema
-│       └── .env.local # Convex environment variables
 ```
 
 ## Available Scripts
@@ -63,4 +57,3 @@ purple/
 - `bun dev:web`: Start only the web application
 - `bun dev:setup`: Setup and configure your Convex project
 - `bun check-types`: Check TypeScript types across all apps
-- `bun check`: Run Biome formatting and linting

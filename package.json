@@ -18,6 +18,7 @@
 	"dependencies": {},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.2",
+		"shadcn": "^3.2.1",
 		"turbo": "^2.5.6",
 		"ultracite": "5.2.7"
 	},
