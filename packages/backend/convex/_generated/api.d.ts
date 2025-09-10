@@ -13,9 +13,11 @@ import type {
   FilterApi,
   FunctionReference,
 } from 'convex/server';
+import type * as actions from '../actions.js';
 import type * as healthCheck from '../healthCheck.js';
 import type * as privateData from '../privateData.js';
-import type * as todos from '../todos.js';
+import type * as projects from '../projects.js';
+import type * as users from '../users.js';
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -26,9 +28,11 @@ import type * as todos from '../todos.js';
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  actions: typeof actions;
   healthCheck: typeof healthCheck;
   privateData: typeof privateData;
-  todos: typeof todos;
+  projects: typeof projects;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

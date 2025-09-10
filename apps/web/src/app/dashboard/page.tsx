@@ -226,8 +226,8 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {projects === undefined &&
                   // Loading skeletons
-                  Array.from({ length: 2 }).map((_, i) => (
-                    <Card key={`loading-${i}`}>
+                  Array.from({ length: 2 }, (_, i) => (
+                    <Card key={`loading-skeleton-${i + 1}`}>
                       <CardHeader>
                         <Skeleton className="h-5 w-3/4" />
                         <Skeleton className="h-4 w-1/2" />
@@ -308,8 +308,8 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {recentActions === undefined &&
                   // Loading skeletons
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <Card key={`activity-loading-${i}`}>
+                  Array.from({ length: 3 }, (_, i) => (
+                    <Card key={`activity-skeleton-${i + 1}`}>
                       <CardContent className="py-4">
                         <Skeleton className="mb-2 h-4 w-3/4" />
                         <Skeleton className="h-3 w-1/2" />
@@ -398,8 +398,8 @@ export default function Dashboard() {
           <div className="space-y-4">
             <Skeleton className="h-8 w-64" />
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={`auth-loading-${i}`}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <Card key={`auth-skeleton-${i + 1}`}>
                   <CardHeader>
                     <Skeleton className="h-4 w-20" />
                   </CardHeader>

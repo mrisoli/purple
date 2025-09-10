@@ -30,6 +30,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const getActionIcon = (actionType: string) => {
+  if (actionType === 'milestone_reached') {
+    return <CheckCircle className="h-4 w-4 text-green-600" />;
+  }
+  if (actionType === 'challenge_faced') {
+    return <Clock className="h-4 w-4 text-amber-600" />;
+  }
+  if (actionType === 'help_needed') {
+    return <UserPlus className="h-4 w-4 text-red-600" />;
+  }
+  return <Activity className="h-4 w-4 text-blue-600" />;
+};
+
 export default function ProjectPage() {
   const { user } = useUser();
   const params = useParams();
@@ -229,10 +242,10 @@ export default function ProjectPage() {
                   <div className="space-y-4">
                     {actions === undefined ? (
                       // Loading skeletons
-                      Array.from({ length: 3 }).map((_, i) => (
+                      Array.from({ length: 3 }, (_, i) => (
                         <div
                           className="flex gap-3 rounded-lg border p-4"
-                          key={i}
+                          key={`action-skeleton-${i + 1}`}
                         >
                           <Skeleton className="h-4 w-4 rounded-full" />
                           <div className="flex-1">
@@ -259,15 +272,7 @@ export default function ProjectPage() {
                           key={action._id}
                         >
                           <div className="mt-1">
-                            {action.type === 'milestone_reached' ? (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                            ) : action.type === 'challenge_faced' ? (
-                              <Clock className="h-4 w-4 text-amber-600" />
-                            ) : action.type === 'help_needed' ? (
-                              <UserPlus className="h-4 w-4 text-red-600" />
-                            ) : (
-                              <Activity className="h-4 w-4 text-blue-600" />
-                            )}
+                            {getActionIcon(action.type)}
                           </div>
                           <div className="flex-1">
                             <div className="mb-1 flex items-start justify-between">

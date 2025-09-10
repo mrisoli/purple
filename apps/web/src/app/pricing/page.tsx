@@ -12,6 +12,36 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
+const renderButton = (buttonText: string, recommended: boolean) => {
+  if (buttonText === 'Start Free Trial') {
+    return (
+      <SignUpButton mode="modal">
+        <Button
+          className="w-full"
+          size="lg"
+          variant={recommended ? 'default' : 'outline'}
+        >
+          {buttonText}
+        </Button>
+      </SignUpButton>
+    );
+  }
+  if (buttonText === 'Get Started Free') {
+    return (
+      <SignUpButton mode="modal">
+        <Button className="w-full" size="lg" variant="outline">
+          {buttonText}
+        </Button>
+      </SignUpButton>
+    );
+  }
+  return (
+    <Button className="w-full" size="lg" variant="outline">
+      {buttonText}
+    </Button>
+  );
+};
+
 export default function PricingPage() {
   const plans = [
     {
@@ -180,27 +210,7 @@ export default function PricingPage() {
                   </Button>
                 </Authenticated>
                 <Unauthenticated>
-                  {buttonText === 'Start Free Trial' ? (
-                    <SignUpButton mode="modal">
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        variant={recommended ? 'default' : 'outline'}
-                      >
-                        {buttonText}
-                      </Button>
-                    </SignUpButton>
-                  ) : buttonText === 'Get Started Free' ? (
-                    <SignUpButton mode="modal">
-                      <Button className="w-full" size="lg" variant="outline">
-                        {buttonText}
-                      </Button>
-                    </SignUpButton>
-                  ) : (
-                    <Button className="w-full" size="lg" variant="outline">
-                      {buttonText}
-                    </Button>
-                  )}
+                  {renderButton(buttonText, recommended)}
                 </Unauthenticated>
 
                 <div className="space-y-4">
