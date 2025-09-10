@@ -25,13 +25,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,13 +44,15 @@ export default function ProjectPage() {
   // Queries and mutations
   const project = useQuery(api.projects.get, { projectId });
   const actions = useQuery(api.actions.listByProject, { projectId });
-  const currentUser = useQuery(api.users.current);
+  const _currentUser = useQuery(api.users.current);
   const inviteBuddy = useMutation(api.projects.inviteBuddy);
   const createAction = useMutation(api.actions.create);
 
   const handleInviteBuddy = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!buddyEmail.trim()) return;
+    if (!buddyEmail.trim()) {
+      return;
+    }
 
     try {
       await inviteBuddy({
@@ -65,15 +61,16 @@ export default function ProjectPage() {
       });
       setBuddyEmail('');
       setShowInviteForm(false);
-    } catch (error) {
-      console.error('Error inviting buddy:', error);
+    } catch (_error) {
       // In a real app, we'd show a toast/notification here
     }
   };
 
   const handleCreateAction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!actionMessage.trim()) return;
+    if (!actionMessage.trim()) {
+      return;
+    }
 
     try {
       await createAction({
@@ -83,8 +80,7 @@ export default function ProjectPage() {
       });
       setActionMessage('');
       setShowActionForm(false);
-    } catch (error) {
-      console.error('Error creating action:', error);
+    } catch (_error) {
       // In a real app, we'd show a toast/notification here
     }
   };

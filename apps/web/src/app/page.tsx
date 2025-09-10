@@ -1,7 +1,7 @@
 'use client';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { Authenticated, Unauthenticated } from 'convex/react';
-import { ArrowRight, CheckCircle, Shield, Users, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {

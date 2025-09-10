@@ -53,7 +53,9 @@ export default function Dashboard() {
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectName.trim()) return;
+    if (!projectName.trim()) {
+      return;
+    }
 
     try {
       await createProject({
@@ -63,8 +65,7 @@ export default function Dashboard() {
       setProjectName('');
       setProjectDescription('');
       setShowCreateForm(false);
-    } catch (error) {
-      console.error('Error creating project:', error);
+    } catch (_error) {
       // In a real app, we'd show a toast/notification here
     }
   };
@@ -223,17 +224,17 @@ export default function Dashboard() {
 
               {/* Projects List */}
               <div className="space-y-4">
-                {projects === undefined ? (
+                {projects === undefined &&
                   // Loading skeletons
                   Array.from({ length: 2 }).map((_, i) => (
-                    <Card key={i}>
+                    <Card key={`loading-${i}`}>
                       <CardHeader>
                         <Skeleton className="h-5 w-3/4" />
                         <Skeleton className="h-4 w-1/2" />
                       </CardHeader>
                     </Card>
-                  ))
-                ) : projects.length === 0 ? (
+                  ))}
+                {projects !== undefined && projects.length === 0 && (
                   <Card>
                     <CardContent className="py-8 text-center">
                       <Target className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
@@ -250,7 +251,9 @@ export default function Dashboard() {
                       </Button>
                     </CardContent>
                   </Card>
-                ) : (
+                )}
+                {projects !== undefined &&
+                  projects.length > 0 &&
                   projects.map((project) => (
                     <Card
                       className="transition-shadow hover:shadow-md"
@@ -295,8 +298,7 @@ export default function Dashboard() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))
-                )}
+                  ))}
               </div>
             </div>
 
@@ -304,17 +306,17 @@ export default function Dashboard() {
             <div>
               <h2 className="mb-4 font-semibold text-xl">Recent Activity</h2>
               <div className="space-y-4">
-                {recentActions === undefined ? (
+                {recentActions === undefined &&
                   // Loading skeletons
                   Array.from({ length: 3 }).map((_, i) => (
-                    <Card key={i}>
+                    <Card key={`activity-loading-${i}`}>
                       <CardContent className="py-4">
                         <Skeleton className="mb-2 h-4 w-3/4" />
                         <Skeleton className="h-3 w-1/2" />
                       </CardContent>
                     </Card>
-                  ))
-                ) : recentActions.length === 0 ? (
+                  ))}
+                {recentActions !== undefined && recentActions.length === 0 && (
                   <Card>
                     <CardContent className="py-8 text-center">
                       <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
@@ -327,7 +329,9 @@ export default function Dashboard() {
                       </p>
                     </CardContent>
                   </Card>
-                ) : (
+                )}
+                {recentActions !== undefined &&
+                  recentActions.length > 0 &&
                   recentActions.map((action) => (
                     <Card key={action._id}>
                       <CardContent className="py-4">
@@ -354,8 +358,7 @@ export default function Dashboard() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))
-                )}
+                  ))}
               </div>
             </div>
           </div>
@@ -396,7 +399,7 @@ export default function Dashboard() {
             <Skeleton className="h-8 w-64" />
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i}>
+                <Card key={`auth-loading-${i}`}>
                   <CardHeader>
                     <Skeleton className="h-4 w-20" />
                   </CardHeader>

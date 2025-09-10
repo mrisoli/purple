@@ -20,7 +20,7 @@
       "!**/wrangler.jsonc",
       "!**/.source",
       "!**/convex/tsconfig.json",
-      "!**/convex/_generated/**"
+      "!**/convex/_generated"
     ]
   },
   "extends": ["ultracite"]
