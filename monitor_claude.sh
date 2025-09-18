@@ -9,6 +9,9 @@ echo "Press Ctrl+C to stop monitoring."
 while true; do
   echo "[$(date)] Starting Claude process..."
 
+  # ensure latest version
+  git pull
+
   # Run Claude and wait for it to complete
   cat PROMPT.md | claude -p --dangerously-skip-permissions
 
@@ -19,6 +22,9 @@ while true; do
 
   # Optional: Log the restart
   echo "[$(date)] Claude exited with status $EXIT_STATUS, restarting..." >> /root/claude-experiments/claude_monitor.log
+
+  # push changes
+  git push
 
   # Wait a bit before restarting to avoid rapid restart loops
   echo "Waiting 3 hours before restart..."
