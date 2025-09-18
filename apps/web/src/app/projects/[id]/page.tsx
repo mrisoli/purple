@@ -1,6 +1,6 @@
 'use client';
 
-import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { SignInButton, UserButton } from '@clerk/nextjs';
 import { api } from '@purple/backend/convex/_generated/api';
 import type { Id } from '@purple/backend/convex/_generated/dataModel';
 import {
@@ -44,7 +44,6 @@ const getActionIcon = (actionType: string) => {
 };
 
 export default function ProjectPage() {
-  const { user } = useUser();
   const params = useParams();
   const projectId = params.id as Id<'projects'>;
 
@@ -240,33 +239,38 @@ export default function ProjectPage() {
 
                   {/* Actions List */}
                   <div className="space-y-4">
-                    {actions === undefined ? (
-                      // Loading skeletons
-                      Array.from({ length: 3 }, (_, i) => (
-                        <div
-                          className="flex gap-3 rounded-lg border p-4"
-                          key={`action-skeleton-${i + 1}`}
-                        >
-                          <Skeleton className="h-4 w-4 rounded-full" />
-                          <div className="flex-1">
-                            <Skeleton className="mb-2 h-4 w-3/4" />
-                            <Skeleton className="h-3 w-1/2" />
+                    {(() => {
+                      if (actions === undefined) {
+                        return Array.from({ length: 3 }, (_, i) => (
+                          <div
+                            className="flex gap-3 rounded-lg border p-4"
+                            key={`action-skeleton-${i + 1}`}
+                          >
+                            <Skeleton className="h-4 w-4 rounded-full" />
+                            <div className="flex-1">
+                              <Skeleton className="mb-2 h-4 w-3/4" />
+                              <Skeleton className="h-3 w-1/2" />
+                            </div>
                           </div>
-                        </div>
-                      ))
-                    ) : actions.length === 0 ? (
-                      <div className="py-8 text-center">
-                        <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                        <h3 className="mb-2 font-medium text-lg">
-                          No actions yet
-                        </h3>
-                        <p className="text-muted-foreground">
-                          Start logging your progress to build your
-                          accountability timeline!
-                        </p>
-                      </div>
-                    ) : (
-                      actions.map((action) => (
+                        ));
+                      }
+
+                      if (actions.length === 0) {
+                        return (
+                          <div className="py-8 text-center">
+                            <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                            <h3 className="mb-2 font-medium text-lg">
+                              No actions yet
+                            </h3>
+                            <p className="text-muted-foreground">
+                              Start logging your progress to build your
+                              accountability timeline!
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return actions.map((action) => (
                         <div
                           className="flex gap-3 rounded-lg border p-4"
                           key={action._id}
@@ -291,8 +295,8 @@ export default function ProjectPage() {
                             <p className="text-sm">{action.message}</p>
                           </div>
                         </div>
-                      ))
-                    )}
+                      ));
+                    })()}
                   </div>
                 </CardContent>
               </Card>
