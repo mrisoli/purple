@@ -10,7 +10,7 @@ while true; do
   echo "[$(date)] Starting Claude process..."
 
   # Run Claude and wait for it to complete
-  cat PROMPT.MD | claude -p --dangerously-skip-permissions
+  cat PROMPT.md | claude -p --dangerously-skip-permissions
 
   # Get the exit status
   EXIT_STATUS=$?
