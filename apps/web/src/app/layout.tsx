@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'purple',
-  description: 'purple',
+  title: 'Purple - Accountability Buddy Network',
+  description: 'Transform your goals into achievements with accountability partners. Track progress, invite buddies, and stay motivated on your journey to success.',
 };
 
 export default function RootLayout({

@@ -1,59 +1,241 @@
-# get-poor
+# Purple - Accountability Buddy Network
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, Convex, and more.
+Transform your goals into achievements with accountability partners. Track progress, invite buddies, and stay motivated on your journey to success.
 
-## Features
+## ✨ Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Start** - SSR framework with TanStack Router
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Convex** - Reactive backend-as-a-service platform
-- **Turborepo** - Optimized monorepo build system
+### Core Functionality
+- **🎯 Goal Setting & Projects**: Create accountability projects with detailed descriptions
+- **👥 Buddy System**: Invite friends, family, or colleagues as accountability partners
+- **📈 Progress Tracking**: Log updates, milestones, and challenges with a detailed timeline
+- **🔔 Real-time Updates**: Live synchronization across all users using Convex
+- **📊 Statistics & Analytics**: Track your accountability journey with comprehensive metrics
 
-## Getting Started
+### Subscription Tiers
+- **Free Tier**: 1 project with full buddy functionality
+- **Premium Tier**: Unlimited projects with advanced features
+- **Team Tier**: Organizational accountability with team dashboards
 
-First, install the dependencies:
+### Technical Features
+- **🔐 Secure Authentication**: Clerk-powered user management
+- **⚡ Real-time Database**: Convex serverless backend
+- **🎨 Modern UI**: shadcn/ui components with Tailwind CSS
+- **📱 Responsive Design**: Works perfectly on all devices
+- **🌙 Dark Mode**: Built-in theme switching
+- **♿ Accessibility**: ARIA-compliant and screen reader friendly
 
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm/bun
+- Clerk account for authentication
+- Convex account for backend/database
+
+### Environment Setup
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd purple
+```
+
+2. **Install dependencies**
 ```bash
 bun install
 ```
 
-## Convex Setup
-
-This project uses Convex as a backend. You'll need to set up Convex before running the app:
-
+3. **Set up Clerk Authentication**
+- Create a Clerk application at [clerk.com](https://clerk.com)
+- Copy your API keys to `.env.local` in `apps/web/`:
 ```bash
-bun dev:setup
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
 ```
 
-Follow the prompts to create a new Convex project and connect it to your application.
-
-Then, run the development server:
-
+4. **Set up Convex Backend**
+- Create a Convex project at [convex.dev](https://convex.dev)
+- Run setup in the backend directory:
 ```bash
-bun dev
+cd packages/backend
+npx convex init
+npx convex dev --configure
+```
+- Add Convex URL to `apps/web/.env.local`:
+```bash
+NEXT_PUBLIC_CONVEX_URL=https://your-convex-url.convex.cloud
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-Your app will connect to the Convex cloud backend automatically.
+5. **Configure Clerk + Convex Integration**
+- In your Convex dashboard, add your Clerk JWT issuer domain
+- Set the environment variable in Convex:
+```bash
+CLERK_JWT_ISSUER_DOMAIN=https://your-clerk-domain.clerk.accounts.dev
+```
 
+### Running the Application
 
+1. **Start the backend (Convex)**
+```bash
+npm run dev:server
+```
 
-## Project Structure
+2. **Start the frontend (Next.js)**
+```bash
+npm run dev:web
+```
+
+3. **Visit the application**
+Open [http://localhost:3001](http://localhost:3001) in your browser.
+
+## 🏗️ Project Structure
 
 ```
-get-poor/
+purple/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Start)
+│   └── web/                 # Next.js frontend application
+│       ├── src/
+│       │   ├── app/         # App router pages
+│       │   ├── components/  # React components
+│       │   └── lib/         # Utilities
+│       └── package.json
 ├── packages/
-│   └── backend/     # Convex backend functions and schema
+│   └── backend/             # Convex backend
+│       ├── convex/          # Database schema & functions
+│       │   ├── schema.ts    # Database schema definition
+│       │   ├── users.ts     # User management functions
+│       │   ├── projects.ts  # Project management functions
+│       │   └── actions.ts   # Action logging functions
+│       └── package.json
+├── SPEC.md                  # Detailed implementation specification
+└── README.md               # This file
 ```
 
-## Available Scripts
+## 🧪 Testing
 
-- `bun dev`: Start all applications in development mode
-- `bun build`: Build all applications
-- `bun dev:web`: Start only the web application
-- `bun dev:setup`: Setup and configure your Convex project
-- `bun check-types`: Check TypeScript types across all apps
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run backend tests
+npm run test --workspace=@purple/backend
+
+# Run frontend tests  
+npm run test --workspace=web
+
+# Run with coverage
+npm run test:coverage
+```
+
+### Test Structure
+- **Unit Tests**: Individual function testing
+- **Integration Tests**: Clerk + Convex authentication flow
+- **Component Tests**: React component testing
+- **E2E Tests**: Full user journey testing (planned)
+
+## 📚 Database Schema
+
+### Users Table
+```typescript
+{
+  clerkId: string,        // Clerk user ID
+  email: string,          // User email
+  name: string,           // Display name
+  premium: boolean,       // Subscription status
+  createdAt: number       // Timestamp
+}
+```
+
+### Projects Table
+```typescript
+{
+  ownerId: Id<"users">,          // Project owner
+  name: string,                  // Project name
+  description: string,           // Project description
+  buddyId?: Id<"users">,        // Optional accountability buddy
+  createdAt: number             // Timestamp
+}
+```
+
+### Actions Table
+```typescript
+{
+  projectId: Id<"projects">,     // Associated project
+  userId: Id<"users">,          // User who created action
+  type: string,                 // Action type (progress_update, milestone_reached, etc.)
+  message: string,              // Action description
+  createdAt: number            // Timestamp
+}
+```
+
+## 🔧 Development Commands
+
+```bash
+# Start all development servers
+npm run dev
+
+# Start specific services
+npm run dev:web          # Frontend only
+npm run dev:server       # Backend only
+
+# Build for production
+npm run build
+
+# Type checking
+npm run check-types
+
+# Code formatting
+npm run check            # Format and lint with Biome
+```
+
+## 🚢 Deployment
+
+### Frontend (Vercel)
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy automatically on push to main
+
+### Backend (Convex)
+1. Run `npx convex deploy` in packages/backend
+2. Convex handles deployment and scaling automatically
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes following the coding standards in `CLAUDE.md`
+4. Run tests: `npm test`
+5. Format code: `npm run check`
+6. Commit changes: `git commit -m 'Add amazing feature'`
+7. Push to branch: `git push origin feature/amazing-feature`
+8. Open a Pull Request
+
+## 📋 Roadmap
+
+- [ ] **Premium Subscription Integration**: Stripe integration for Premium upgrades
+- [ ] **Mobile App**: React Native mobile application
+- [ ] **Email Notifications**: Buddy reminders and milestone celebrations
+- [ ] **Advanced Analytics**: Goal completion insights and trends
+- [ ] **Team Features**: Organizational dashboards and admin tools
+- [ ] **Integrations**: Calendar, Slack, and other productivity tools
+
+## 🛡️ Security
+
+- All user data is encrypted in transit and at rest
+- Authentication handled by Clerk with industry-standard security
+- Database queries secured with Convex's built-in authorization
+- No sensitive data stored in local storage or cookies
+
+## 📄 License
+
+This project is proprietary. All rights reserved.
+
+## 🆘 Support
+
+- 📧 Email: support@purple.app
+- 📚 Documentation: [docs.purple.app](https://docs.purple.app)
+- 🐛 Bug Reports: [GitHub Issues](https://github.com/your-org/purple/issues)
+
+---
+
+Built with ❤️ by the Purple team.
