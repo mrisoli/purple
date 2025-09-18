@@ -182,17 +182,10 @@ export default function PricingPage() {
                 <div className="space-y-4">
                   <div className="font-bold text-4xl">
                     {price}
-                    {price !== 'Custom' && (
-                      <span className="font-normal text-lg text-muted-foreground">
-                        /{billing}
-                      </span>
-                    )}
+                    <span className="font-normal text-lg text-muted-foreground">
+                      /{billing}
+                    </span>
                   </div>
-                  {price === 'Custom' && (
-                    <div className="text-muted-foreground text-sm">
-                      {billing}
-                    </div>
-                  )}
                 </div>
                 <CardDescription className="text-base">
                   {description}
