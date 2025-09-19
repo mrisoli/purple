@@ -4,6 +4,7 @@ import '../index.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
+import { SkipLink } from '@/components/skip-link';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -33,9 +34,12 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <Providers>
+            <SkipLink />
             <div className="grid h-svh grid-rows-[auto_1fr]">
               <Header />
-              {children}
+              <main id="main-content">
+                {children}
+              </main>
             </div>
           </Providers>
         </ClerkProvider>

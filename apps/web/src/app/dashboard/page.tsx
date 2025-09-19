@@ -28,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { EmptyState } from '@/components/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -242,22 +243,15 @@ export default function Dashboard() {
                     </Card>
                   ))}
                 {projects !== undefined && projects.length === 0 && (
-                  <Card>
-                    <CardContent className="py-8 text-center">
-                      <Target className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                      <h3 className="mb-2 font-medium text-lg">
-                        No projects yet
-                      </h3>
-                      <p className="mb-4 text-muted-foreground">
-                        Create your first project to start your accountability
-                        journey!
-                      </p>
-                      <Button onClick={() => setShowCreateForm(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Your First Project
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <EmptyState
+                    icon={Target}
+                    title="No projects yet"
+                    description="Create your first project to start your accountability journey!"
+                    action={{
+                      label: 'Create Your First Project',
+                      onClick: () => setShowCreateForm(true),
+                    }}
+                  />
                 )}
                 {projects !== undefined &&
                   projects.length > 0 &&
@@ -324,18 +318,11 @@ export default function Dashboard() {
                     </Card>
                   ))}
                 {recentActions !== undefined && recentActions.length === 0 && (
-                  <Card>
-                    <CardContent className="py-8 text-center">
-                      <Activity className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                      <h3 className="mb-2 font-medium text-lg">
-                        No activity yet
-                      </h3>
-                      <p className="text-muted-foreground">
-                        Start logging progress updates to see your activity
-                        timeline!
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <EmptyState
+                    icon={Activity}
+                    title="No activity yet"
+                    description="Start logging progress updates to see your activity timeline!"
+                  />
                 )}
                 {recentActions !== undefined &&
                   recentActions.length > 0 &&
