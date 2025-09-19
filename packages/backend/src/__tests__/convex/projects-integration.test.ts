@@ -1,7 +1,56 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+// Type definitions for test mocks
+interface MockIdentity {
+  subject: string;
+  email?: string;
+}
+
+interface MockUser {
+  _id: string;
+  clerkId: string;
+  email: string;
+  name: string;
+  premium: boolean;
+  createdAt: number;
+}
+
+interface MockProject {
+  _id: string;
+  ownerId: string;
+  name: string;
+  description: string;
+  buddyId?: string;
+  createdAt: number;
+}
+
+interface MockQuery {
+  withIndex: ReturnType<typeof vi.fn>;
+  filter: ReturnType<typeof vi.fn>;
+  unique: ReturnType<typeof vi.fn>;
+  collect: ReturnType<typeof vi.fn>;
+  eq: ReturnType<typeof vi.fn>;
+  field: ReturnType<typeof vi.fn>;
+}
+
+interface MockDatabase {
+  query: ReturnType<typeof vi.fn>;
+  insert: ReturnType<typeof vi.fn>;
+  get: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+}
+
+interface MockContext {
+  auth: {
+    getUserIdentity: ReturnType<typeof vi.fn>;
+  };
+  db: MockDatabase;
+}
+
 // Mock Convex environment
-const createMockContext = (identity = null) => ({
+const createMockContext = (
+  identity: MockIdentity | null = null
+): MockContext => ({
   auth: {
     getUserIdentity: vi.fn().mockResolvedValue(identity),
   },
@@ -14,16 +63,19 @@ const createMockContext = (identity = null) => ({
 });
 
 // Mock query builder
-const createMockQuery = (data) => ({
+const createMockQuery = (
+  data: MockUser | MockProject | MockUser[] | MockProject[] | null
+): MockQuery => ({
   withIndex: vi.fn().mockReturnThis(),
   filter: vi.fn().mockReturnThis(),
   unique: vi.fn().mockResolvedValue(Array.isArray(data) ? data[0] : data),
   collect: vi.fn().mockResolvedValue(Array.isArray(data) ? data : [data]),
   eq: vi.fn(),
+  field: vi.fn().mockReturnValue('email'),
 });
 
 // Helper functions to reduce cognitive complexity
-const getUserFromAuth = async (ctx: any) => {
+const getUserFromAuth = async (ctx: MockContext) => {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     throw new Error('Not authenticated');
@@ -31,7 +83,9 @@ const getUserFromAuth = async (ctx: any) => {
 
   const currentUser = await ctx.db
     .query('users')
-    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .withIndex('by_clerkId', (q: MockQuery) =>
+      q.eq('clerkId', identity.subject)
+    )
     .unique();
 
   if (!currentUser) {
@@ -41,11 +95,11 @@ const getUserFromAuth = async (ctx: any) => {
   return { identity, currentUser };
 };
 
-const checkProjectLimit = async (ctx: any, user: any) => {
+const checkProjectLimit = async (ctx: MockContext, user: MockUser) => {
   if (!user.premium) {
     const userProjects = await ctx.db
       .query('projects')
-      .withIndex('by_owner', (q: any) => q.eq('ownerId', user._id))
+      .withIndex('by_owner', (q: MockQuery) => q.eq('ownerId', user._id))
       .collect();
 
     if (userProjects.length >= 1) {
@@ -56,7 +110,20 @@ const checkProjectLimit = async (ctx: any, user: any) => {
   }
 };
 
-const createProjectMutation = async (ctx: any, args: any) => {
+interface CreateProjectArgs {
+  name: string;
+  description: string;
+}
+
+interface InviteBuddyArgs {
+  projectId: string;
+  buddyEmail: string;
+}
+
+const createProjectMutation = async (
+  ctx: MockContext,
+  args: CreateProjectArgs
+) => {
   const { currentUser } = await getUserFromAuth(ctx);
   await checkProjectLimit(ctx, currentUser);
 
@@ -70,7 +137,7 @@ const createProjectMutation = async (ctx: any, args: any) => {
   return await ctx.db.get(newProjectId);
 };
 
-const inviteBuddyMutation = async (ctx: any, args: any) => {
+const inviteBuddyMutation = async (ctx: MockContext, args: InviteBuddyArgs) => {
   const { currentUser } = await getUserFromAuth(ctx);
 
   const currentProject = await ctx.db.get(args.projectId);
@@ -84,7 +151,7 @@ const inviteBuddyMutation = async (ctx: any, args: any) => {
 
   const invitedBuddy = await ctx.db
     .query('users')
-    .filter((q: any) => q.eq(q.field('email'), args.buddyEmail))
+    .filter((q: MockQuery) => q.eq(q.field('email'), args.buddyEmail))
     .unique();
 
   if (!invitedBuddy) {
@@ -98,7 +165,11 @@ const inviteBuddyMutation = async (ctx: any, args: any) => {
   return { success: true };
 };
 
-const getProjectQuery = async (ctx: any, args: any) => {
+interface GetProjectArgs {
+  projectId: string;
+}
+
+const getProjectQuery = async (ctx: MockContext, args: GetProjectArgs) => {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     return null;
@@ -111,7 +182,9 @@ const getProjectQuery = async (ctx: any, args: any) => {
 
   const currentUser = await ctx.db
     .query('users')
-    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .withIndex('by_clerkId', (q: MockQuery) =>
+      q.eq('clerkId', identity.subject)
+    )
     .unique();
 
   if (!currentUser) {
@@ -127,18 +200,6 @@ const getProjectQuery = async (ctx: any, args: any) => {
   }
 
   return null;
-};
-
-type MockContext = {
-  auth: {
-    getUserIdentity: ReturnType<typeof vi.fn>;
-  };
-  db: {
-    query: ReturnType<typeof vi.fn>;
-    insert: ReturnType<typeof vi.fn>;
-    get: ReturnType<typeof vi.fn>;
-    patch: ReturnType<typeof vi.fn>;
-  };
 };
 
 describe('Projects Integration Tests', () => {
@@ -208,7 +269,7 @@ describe('Projects Integration Tests', () => {
         .mockReturnValueOnce(createMockQuery(mockLimitedUser))
         .mockReturnValueOnce(createMockQuery([mockExistingProject]));
 
-      const create = async (ctx: any, _args: any) => {
+      const create = async (ctx: MockContext, _args: CreateProjectArgs) => {
         const { currentUser } = await getUserFromAuth(ctx);
         await checkProjectLimit(ctx, currentUser);
         return null;
@@ -312,7 +373,7 @@ describe('Projects Integration Tests', () => {
       mockCtx.db.get.mockResolvedValue(mockRestrictedProject);
       mockCtx.db.query.mockReturnValueOnce(createMockQuery(mockNonOwner));
 
-      const inviteBuddy = async (ctx: any, args: any) => {
+      const inviteBuddy = async (ctx: MockContext, args: InviteBuddyArgs) => {
         const { currentUser } = await getUserFromAuth(ctx);
         const currentProject = await ctx.db.get(args.projectId);
 
@@ -348,7 +409,7 @@ describe('Projects Integration Tests', () => {
         .mockReturnValueOnce(createMockQuery(mockProjectOwner))
         .mockReturnValueOnce(createMockQuery(null)); // Buddy not found
 
-      const inviteBuddy = async (ctx: any, args: any) => {
+      const inviteBuddy = async (ctx: MockContext, args: InviteBuddyArgs) => {
         const { currentUser } = await getUserFromAuth(ctx);
         const currentProject = await ctx.db.get(args.projectId);
 
@@ -358,7 +419,7 @@ describe('Projects Integration Tests', () => {
 
         const invitedBuddy = await ctx.db
           .query('users')
-          .filter((q: any) => q.eq(q.field('email'), args.buddyEmail))
+          .filter((q: MockQuery) => q.eq(q.field('email'), args.buddyEmail))
           .unique();
 
         if (!invitedBuddy) {
@@ -419,12 +480,12 @@ describe('Projects Integration Tests', () => {
       mockCtx.db.get.mockResolvedValue(mockInaccessibleProject);
       mockCtx.db.query.mockReturnValue(createMockQuery(mockUnauthorizedUser));
 
-      const get = async (ctx: any, args: any) => {
+      const get = async (ctx: MockContext, args: GetProjectArgs) => {
         const identity = await ctx.auth.getUserIdentity();
         const currentProject = await ctx.db.get(args.projectId);
         const currentUser = await ctx.db
           .query('users')
-          .withIndex('by_clerkId', (q: any) =>
+          .withIndex('by_clerkId', (q: MockQuery) =>
             q.eq('clerkId', identity.subject)
           )
           .unique();
