@@ -77,10 +77,9 @@ export default function ProjectPage() {
       setShowInviteForm(false);
       toast.success('Buddy invited successfully!');
     } catch (error) {
-      console.error('Error inviting buddy:', error);
       toast.error(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : 'Failed to invite buddy. Please try again.'
       );
     }
@@ -103,10 +102,9 @@ export default function ProjectPage() {
       setShowActionForm(false);
       toast.success('Progress logged successfully!');
     } catch (error) {
-      console.error('Error creating action:', error);
       toast.error(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : 'Failed to log progress. Please try again.'
       );
     }

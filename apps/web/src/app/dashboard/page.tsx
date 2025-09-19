@@ -69,10 +69,9 @@ export default function Dashboard() {
       setShowCreateForm(false);
       toast.success('Project created successfully!');
     } catch (error) {
-      console.error('Error creating project:', error);
       toast.error(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : 'Failed to create project. Please try again.'
       );
     }
