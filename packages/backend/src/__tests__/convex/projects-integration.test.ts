@@ -22,8 +22,20 @@ const createMockQuery = (data) => ({
   eq: vi.fn(),
 });
 
+type MockContext = {
+  auth: {
+    getUserIdentity: ReturnType<typeof vi.fn>;
+  };
+  db: {
+    query: ReturnType<typeof vi.fn>;
+    insert: ReturnType<typeof vi.fn>;
+    get: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+  };
+};
+
 describe('Projects Integration Tests', () => {
-  let mockCtx;
+  let mockCtx: MockContext;
   const mockIdentity = {
     subject: 'clerk-123',
     email: 'test@example.com',
@@ -61,23 +73,23 @@ describe('Projects Integration Tests', () => {
           throw new Error('Not authenticated');
         }
 
-        const user = await ctx.db
+        const currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user) {
+        if (!currentUser) {
           throw new Error('User not found');
         }
 
         // Check project limit for free users
-        if (!user.premium) {
-          const existingProjects = await ctx.db
+        if (!currentUser.premium) {
+          const userProjects = await ctx.db
             .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
             .collect();
 
-          if (existingProjects.length >= 1) {
+          if (userProjects.length >= 1) {
             throw new Error(
               'Free users can only create 1 project. Upgrade to premium for unlimited projects.'
             );
@@ -85,7 +97,7 @@ describe('Projects Integration Tests', () => {
         }
 
         const newProjectId = await ctx.db.insert('projects', {
-          ownerId: user._id,
+          ownerId: currentUser._id,
           name: args.name,
           description: args.description,
           createdAt: Date.now(),
@@ -126,28 +138,28 @@ describe('Projects Integration Tests', () => {
         .mockReturnValueOnce(createMockQuery(user))
         .mockReturnValueOnce(createMockQuery([existingProject]));
 
-      const create = async (ctx, args) => {
+      const create = async (ctx, _args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
           throw new Error('Not authenticated');
         }
 
-        const user = await ctx.db
+        const currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user) {
+        if (!currentUser) {
           throw new Error('User not found');
         }
 
-        if (!user.premium) {
-          const existingProjects = await ctx.db
+        if (!currentUser.premium) {
+          const userProjects = await ctx.db
             .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
             .collect();
 
-          if (existingProjects.length >= 1) {
+          if (userProjects.length >= 1) {
             throw new Error(
               'Free users can only create 1 project. Upgrade to premium for unlimited projects.'
             );
@@ -190,24 +202,24 @@ describe('Projects Integration Tests', () => {
 
       const create = async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        const user = await ctx.db
+        const currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user.premium) {
-          const existingProjects = await ctx.db
+        if (!currentUser.premium) {
+          const userProjects = await ctx.db
             .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
+            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
             .collect();
 
-          if (existingProjects.length >= 1) {
+          if (userProjects.length >= 1) {
             throw new Error('Free users can only create 1 project');
           }
         }
 
         const newProjectId = await ctx.db.insert('projects', {
-          ownerId: user._id,
+          ownerId: currentUser._id,
           name: args.name,
           description: args.description,
           createdAt: Date.now(),
@@ -258,32 +270,32 @@ describe('Projects Integration Tests', () => {
           throw new Error('Not authenticated');
         }
 
-        const project = await ctx.db.get(args.projectId);
-        if (!project) {
+        const currentProject = await ctx.db.get(args.projectId);
+        if (!currentProject) {
           throw new Error('Project not found');
         }
 
-        const user = await ctx.db
+        const _currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user || project.ownerId !== user._id) {
+        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
           throw new Error('Only project owner can invite buddies');
         }
 
-        const buddy = await ctx.db
+        const invitedBuddy = await ctx.db
           .query('users')
           .filter((q) => q.eq(q.field('email'), args.buddyEmail))
           .unique();
 
-        if (!buddy) {
+        if (!invitedBuddy) {
           throw new Error(
             'User with this email not found. They need to sign up first.'
           );
         }
 
-        await ctx.db.patch(args.projectId, { buddyId: buddy._id });
+        await ctx.db.patch(args.projectId, { buddyId: invitedBuddy._id });
 
         return { success: true };
       };
@@ -317,13 +329,13 @@ describe('Projects Integration Tests', () => {
 
       const inviteBuddy = async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        const project = await ctx.db.get(args.projectId);
-        const user = await ctx.db
+        const currentProject = await ctx.db.get(args.projectId);
+        const _currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user || project.ownerId !== user._id) {
+        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
           throw new Error('Only project owner can invite buddies');
         }
 
@@ -357,22 +369,22 @@ describe('Projects Integration Tests', () => {
 
       const inviteBuddy = async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        const project = await ctx.db.get(args.projectId);
-        const user = await ctx.db
+        const currentProject = await ctx.db.get(args.projectId);
+        const _currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user || project.ownerId !== user._id) {
+        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
           throw new Error('Only project owner can invite buddies');
         }
 
-        const buddy = await ctx.db
+        const invitedBuddy = await ctx.db
           .query('users')
           .filter((q) => q.eq(q.field('email'), args.buddyEmail))
           .unique();
 
-        if (!buddy) {
+        if (!invitedBuddy) {
           throw new Error(
             'User with this email not found. They need to sign up first.'
           );
@@ -413,23 +425,26 @@ describe('Projects Integration Tests', () => {
           return null;
         }
 
-        const project = await ctx.db.get(args.projectId);
-        if (!project) {
+        const currentProject = await ctx.db.get(args.projectId);
+        if (!currentProject) {
           return null;
         }
 
-        const user = await ctx.db
+        const _currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (!user) {
+        if (!_currentUser) {
           return null;
         }
 
         // User can access project if they own it or are the buddy
-        if (project.ownerId === user._id || project.buddyId === user._id) {
-          return project;
+        if (
+          currentProject.ownerId === _currentUser._id ||
+          currentProject.buddyId === _currentUser._id
+        ) {
+          return currentProject;
         }
 
         return null;
@@ -458,14 +473,17 @@ describe('Projects Integration Tests', () => {
 
       const get = async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        const project = await ctx.db.get(args.projectId);
-        const user = await ctx.db
+        const currentProject = await ctx.db.get(args.projectId);
+        const _currentUser = await ctx.db
           .query('users')
           .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
           .unique();
 
-        if (project.ownerId === user._id || project.buddyId === user._id) {
-          return project;
+        if (
+          currentProject.ownerId === _currentUser._id ||
+          currentProject.buddyId === _currentUser._id
+        ) {
+          return currentProject;
         }
 
         return null;

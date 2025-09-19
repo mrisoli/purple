@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const TEN_SECONDS_AGO = 10_000;
+
 // Mock Convex environment
 const createMockContext = (identity = null) => ({
   auth: {
@@ -22,8 +24,20 @@ const createMockQuery = (data) => ({
   eq: vi.fn(),
 });
 
+type MockContext = {
+  auth: {
+    getUserIdentity: ReturnType<typeof vi.fn>;
+  };
+  db: {
+    query: ReturnType<typeof vi.fn>;
+    insert: ReturnType<typeof vi.fn>;
+    get: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+  };
+};
+
 describe('Users Integration Tests', () => {
-  let mockCtx;
+  let mockCtx: MockContext;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,14 +65,14 @@ describe('Users Integration Tests', () => {
 
       // Mock the function implementation
       const getOrCreate = async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
+        const userIdentity = await ctx.auth.getUserIdentity();
+        if (!userIdentity) {
           throw new Error('Not authenticated');
         }
 
         const existingUser = await ctx.db
           .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
+          .withIndex('by_clerkId', (q) => q.eq('clerkId', userIdentity.subject))
           .unique();
 
         if (existingUser) {
@@ -66,9 +80,9 @@ describe('Users Integration Tests', () => {
         }
 
         const newUserId = await ctx.db.insert('users', {
-          clerkId: identity.subject,
-          email: identity.email ?? '',
-          name: identity.name ?? '',
+          clerkId: userIdentity.subject,
+          email: userIdentity.email ?? '',
+          name: userIdentity.name ?? '',
           premium: false,
           createdAt: Date.now(),
         });
@@ -102,7 +116,7 @@ describe('Users Integration Tests', () => {
         email: 'test@example.com',
         name: 'Test User',
         premium: true,
-        createdAt: Date.now() - 10_000,
+        createdAt: Date.now() - TEN_SECONDS_AGO,
       };
 
       mockCtx = createMockContext(identity);
@@ -110,18 +124,18 @@ describe('Users Integration Tests', () => {
 
       // Mock the function implementation
       const getOrCreate = async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
+        const userIdentity = await ctx.auth.getUserIdentity();
+        if (!userIdentity) {
           throw new Error('Not authenticated');
         }
 
-        const existingUser = await ctx.db
+        const foundUser = await ctx.db
           .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
+          .withIndex('by_clerkId', (q) => q.eq('clerkId', userIdentity.subject))
           .unique();
 
-        if (existingUser) {
-          return existingUser;
+        if (foundUser) {
+          return foundUser;
         }
 
         // Would create new user here
