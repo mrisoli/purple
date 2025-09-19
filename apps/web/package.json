@@ -13,6 +13,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.32.0",
     "@purple/backend": "workspace:*",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@stripe/stripe-js": "^7.9.0",
     "@tanstack/react-form": "^1.21.1",
     "class-variance-authority": "^0.7.1",
