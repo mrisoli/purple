@@ -9,23 +9,23 @@ export const handleSuccessfulPayment = action({
     stripeCustomerId: v.optional(v.string()),
     sessionId: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{ success: boolean; userId?: string; error?: string }> => {
     // For checkout.session.completed events
     if (args.clerkUserId) {
       // Find user by Clerk ID
-      const user = await ctx.runQuery(internal.users.findByClerkId, {
+      const user = await ctx.runQuery(internal.users.findByClerkIdInternal, {
         clerkId: args.clerkUserId,
       });
 
       if (user) {
         // Upgrade user to premium
-        await ctx.runMutation(internal.users.upgradeToPremium, {
+        await ctx.runMutation(internal.users.upgradeToPremiumInternal, {
           userId: user._id,
         });
 
         // Store Stripe customer ID for future reference
         if (args.stripeCustomerId) {
-          await ctx.runMutation(internal.users.updateStripeCustomerId, {
+          await ctx.runMutation(internal.users.updateStripeCustomerIdInternal, {
             userId: user._id,
             stripeCustomerId: args.stripeCustomerId,
           });
@@ -37,12 +37,12 @@ export const handleSuccessfulPayment = action({
 
     // For invoice.payment_succeeded events
     if (args.stripeCustomerId) {
-      const user = await ctx.runQuery(internal.users.findByStripeCustomerId, {
+      const user = await ctx.runQuery(internal.users.findByStripeCustomerIdInternal, {
         stripeCustomerId: args.stripeCustomerId,
       });
 
       if (user && !user.premium) {
-        await ctx.runMutation(internal.users.upgradeToPremium, {
+        await ctx.runMutation(internal.users.upgradeToPremiumInternal, {
           userId: user._id,
         });
       }
@@ -60,8 +60,8 @@ export const handleFailedPayment = action({
     stripeCustomerId: v.string(),
     invoiceId: v.string(),
   },
-  handler: async (ctx, args) => {
-    const user = await ctx.runQuery(internal.users.findByStripeCustomerId, {
+  handler: async (ctx, args): Promise<{ success: boolean; userId?: string; action?: string; error?: string }> => {
+    const user = await ctx.runQuery(internal.users.findByStripeCustomerIdInternal, {
       stripeCustomerId: args.stripeCustomerId,
     });
 
@@ -81,14 +81,14 @@ export const handleSubscriptionCanceled = action({
     stripeCustomerId: v.string(),
     subscriptionId: v.string(),
   },
-  handler: async (ctx, args) => {
-    const user = await ctx.runQuery(internal.users.findByStripeCustomerId, {
+  handler: async (ctx, args): Promise<{ success: boolean; userId?: string; action?: string; error?: string }> => {
+    const user = await ctx.runQuery(internal.users.findByStripeCustomerIdInternal, {
       stripeCustomerId: args.stripeCustomerId,
     });
 
     if (user?.premium) {
       // Downgrade user from premium
-      await ctx.runMutation(internal.users.downgradeFromPremium, {
+      await ctx.runMutation(internal.users.downgradeFromPremiumInternal, {
         userId: user._id,
       });
 
