@@ -1,27 +1,24 @@
 import { Resend } from 'resend';
 
 if (!process.env.RESEND_API_KEY) {
-  console.warn(
-    'RESEND_API_KEY is not set. Email functionality will be disabled.'
-  );
+  // Email functionality will be disabled without API key
 }
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-interface BuddyInvitationEmailData {
+type BuddyInvitationEmailData = {
   buddyEmail: string;
   buddyName?: string;
   inviterName: string;
   projectName: string;
   projectDescription: string;
   inviteLink: string;
-}
+};
 
 export async function sendBuddyInvitationEmail(data: BuddyInvitationEmailData) {
   if (!resend) {
-    console.warn('Resend not configured. Skipping email send.');
     return { success: false, error: 'Email service not configured' };
   }
 
@@ -125,7 +122,6 @@ export async function sendBuddyInvitationEmail(data: BuddyInvitationEmailData) {
 
     return { success: true, data: result };
   } catch (error) {
-    console.error('Error sending buddy invitation email:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email',
@@ -133,14 +129,13 @@ export async function sendBuddyInvitationEmail(data: BuddyInvitationEmailData) {
   }
 }
 
-interface WelcomeEmailData {
+type WelcomeEmailData = {
   userEmail: string;
   userName: string;
-}
+};
 
 export async function sendWelcomeEmail(data: WelcomeEmailData) {
   if (!resend) {
-    console.warn('Resend not configured. Skipping welcome email send.');
     return { success: false, error: 'Email service not configured' };
   }
 
@@ -215,7 +210,6 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
 
     return { success: true, data: result };
   } catch (error) {
-    console.error('Error sending welcome email:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to send email',

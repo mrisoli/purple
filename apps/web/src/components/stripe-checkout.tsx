@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-interface StripeCheckoutProps {
+type StripeCheckoutProps = {
   priceId: string;
   buttonText?: string;
   variant?:
@@ -18,7 +18,7 @@ interface StripeCheckoutProps {
     | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
-}
+};
 
 export function StripeCheckout({
   priceId,
@@ -74,7 +74,6 @@ export function StripeCheckout({
         throw error;
       }
     } catch (error) {
-      console.error('Checkout error:', error);
       toast.error(
         error instanceof Error
           ? error.message

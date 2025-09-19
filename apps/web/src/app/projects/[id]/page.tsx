@@ -102,7 +102,6 @@ export default function ProjectPage() {
         toast.success(
           'Buddy invited successfully! (Email notification failed to send)'
         );
-        console.warn('Email send failed:', emailResult.error);
       }
     } catch (error) {
       toast.error(

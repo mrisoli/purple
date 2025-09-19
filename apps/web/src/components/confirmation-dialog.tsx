@@ -5,14 +5,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 
-interface ConfirmationDialogProps {
+type ConfirmationDialogProps = {
   title: string;
   description: string;
   confirmLabel?: string;
@@ -21,7 +20,7 @@ interface ConfirmationDialogProps {
   onConfirm: () => Promise<void> | void;
   onCancel: () => void;
   isOpen: boolean;
-}
+};
 
 export function ConfirmationDialog({
   title,
@@ -35,7 +34,9 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const handleConfirm = async () => {
     setIsLoading(true);

@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+const TOTAL_PROJECTS_COUNT = 3;
+const PROJECTS_WITHOUT_BUDDIES = 1;
+const PROJECTS_WITH_BUDDIES = 2;
+const RECENT_ACTIONS_COUNT = 2;
+const TEST_YEAR = 2022;
+const JANUARY_MONTH_INDEX = 0;
+const FIRST_DAY = 1;
+const MAX_PROJECTS_FOR_FREE = 1;
+
 describe('Project Utilities', () => {
   it('should calculate dashboard statistics correctly', () => {
     const projects = [
@@ -20,10 +29,10 @@ describe('Project Utilities', () => {
       recentActionsCount: recentActions.length,
     };
 
-    expect(stats.totalProjects).toBe(3);
-    expect(stats.activeProjects).toBe(1); // Projects without buddies
-    expect(stats.withBuddies).toBe(2); // Projects with buddies
-    expect(stats.recentActionsCount).toBe(2);
+    expect(stats.totalProjects).toBe(TOTAL_PROJECTS_COUNT);
+    expect(stats.activeProjects).toBe(PROJECTS_WITHOUT_BUDDIES); // Projects without buddies
+    expect(stats.withBuddies).toBe(PROJECTS_WITH_BUDDIES); // Projects with buddies
+    expect(stats.recentActionsCount).toBe(RECENT_ACTIONS_COUNT);
   });
 
   it('should validate project creation form', () => {
@@ -47,20 +56,20 @@ describe('Project Utilities', () => {
     const timestamp = 1_640_995_200_000; // Jan 1, 2022
     const date = new Date(timestamp);
 
-    expect(date.getFullYear()).toBe(2022);
-    expect(date.getMonth()).toBe(0); // January is 0
-    expect(date.getDate()).toBe(1);
+    expect(date.getFullYear()).toBe(TEST_YEAR);
+    expect(date.getMonth()).toBe(JANUARY_MONTH_INDEX); // January is 0
+    expect(date.getDate()).toBe(FIRST_DAY);
   });
 
   it('should handle premium user limits', () => {
     const freeUser = { premium: false };
     const premiumUser = { premium: true };
 
-    const maxProjectsForFree = 1;
+    const maxProjectsForFree = MAX_PROJECTS_FOR_FREE;
     const maxProjectsForPremium = Number.POSITIVE_INFINITY;
 
     expect(freeUser.premium ? maxProjectsForPremium : maxProjectsForFree).toBe(
-      1
+      MAX_PROJECTS_FOR_FREE
     );
     expect(
       premiumUser.premium ? maxProjectsForPremium : maxProjectsForFree
@@ -76,18 +85,18 @@ describe('Project Utilities', () => {
 
     const invalidEmails = ['notanemail', '@example.com', 'test@', ''];
 
-    validEmails.forEach((email) => {
+    for (const email of validEmails) {
       expect(email.includes('@')).toBe(true);
       expect(email.split('@')).toHaveLength(2);
-    });
+    }
 
-    invalidEmails.forEach((email) => {
+    for (const email of invalidEmails) {
       const isValid =
         email.includes('@') &&
         email.split('@').length === 2 &&
         email.split('@')[0].length > 0 &&
         email.split('@')[1].length > 0;
       expect(isValid).toBe(false);
-    });
+    }
   });
 });

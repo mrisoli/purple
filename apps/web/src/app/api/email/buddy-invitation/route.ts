@@ -88,10 +88,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (!emailResult.success) {
-      console.error(
-        'Failed to send buddy invitation email:',
-        emailResult.error
-      );
       return NextResponse.json(
         { error: 'Failed to send invitation email' },
         { status: 500 }
@@ -103,8 +99,7 @@ export async function POST(request: NextRequest) {
       message: 'Buddy invitation sent successfully',
       hasAccount: !!buddyUser,
     });
-  } catch (error) {
-    console.error('Error sending buddy invitation:', error);
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Failed to send invitation' },
       { status: 500 }

@@ -10,13 +10,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-interface ConfirmationOptions {
+type ConfirmationOptions = {
   title?: string;
   description?: string;
   confirmText?: string;
   cancelText?: string;
   variant?: 'default' | 'destructive';
-}
+};
 
 interface ConfirmationState extends ConfirmationOptions {
   isOpen: boolean;

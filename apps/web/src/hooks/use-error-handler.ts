@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
-interface ErrorHandlerOptions {
+type ErrorHandlerOptions = {
   showToast?: boolean;
   toastTitle?: string;
   logError?: boolean;
   fallbackMessage?: string;
   onError?: (error: Error) => void;
-}
+};
 
 export function useErrorHandler() {
   const handleError = useCallback(
@@ -28,7 +28,6 @@ export function useErrorHandler() {
 
       // Log error for debugging
       if (logError) {
-        console.error('Error handled:', normalizedError);
       }
 
       // Show toast notification

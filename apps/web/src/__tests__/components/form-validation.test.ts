@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PROJECT_NAME_LENGTH = 3;
 const MAX_PROJECT_NAME_LENGTH = 100;
+const MAX_PROJECT_NAME_OVERFLOW = 101;
 
 describe('Form Validation Logic', () => {
   it('should validate required fields', () => {
@@ -52,7 +53,7 @@ describe('Form Validation Logic', () => {
       'Project name must be at least 3 characters'
     );
     expect(validateProjectName('Valid Project Name')).toBeNull();
-    expect(validateProjectName('a'.repeat(101))).toBe(
+    expect(validateProjectName('a'.repeat(MAX_PROJECT_NAME_OVERFLOW))).toBe(
       'Project name must be less than 100 characters'
     );
   });

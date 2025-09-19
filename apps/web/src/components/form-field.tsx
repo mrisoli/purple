@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-interface FormFieldProps {
+type FormFieldProps = {
   label: string;
   id: string;
   value: string;
@@ -14,7 +14,7 @@ interface FormFieldProps {
   error?: string;
   description?: string;
   className?: string;
-}
+};
 
 export function FormField({
   label,

@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (error) {
-    console.error('Webhook signature verification failed:', error);
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Invalid webhook signature' },
       { status: 400 }
@@ -61,7 +60,6 @@ export async function POST(request: NextRequest) {
         const userId = session.metadata?.userId;
 
         if (!userId) {
-          console.error('No userId in checkout session metadata');
           break;
         }
 
@@ -71,10 +69,6 @@ export async function POST(request: NextRequest) {
           stripeCustomerId: session.customer as string,
           sessionId: session.id,
         });
-
-        console.log(
-          `User ${userId} upgraded to premium via session ${session.id}`
-        );
         break;
       }
 
@@ -86,8 +80,6 @@ export async function POST(request: NextRequest) {
         await convex.action(api.stripe.handleSuccessfulPayment, {
           stripeCustomerId: customerId,
         });
-
-        console.log(`Payment succeeded for customer ${customerId}`);
         break;
       }
 
@@ -100,8 +92,6 @@ export async function POST(request: NextRequest) {
           stripeCustomerId: customerId,
           invoiceId: invoice.id,
         });
-
-        console.log(`Payment failed for customer ${customerId}`);
         break;
       }
 
@@ -114,18 +104,14 @@ export async function POST(request: NextRequest) {
           stripeCustomerId: customerId,
           subscriptionId: subscription.id,
         });
-
-        console.log(`Subscription canceled for customer ${customerId}`);
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
-  } catch (error) {
-    console.error('Error handling webhook:', error);
+  } catch (_error) {
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+const EXPECTED_FEATURES_COUNT = 3;
+const EXPECTED_BENEFITS_COUNT = 6;
+const MIN_HERO_DESCRIPTION_LENGTH = 100;
+
 describe('Landing Page Component', () => {
   it('should have proper features structure', () => {
     const features = [
@@ -23,16 +27,16 @@ describe('Landing Page Component', () => {
       },
     ];
 
-    expect(features).toHaveLength(3);
+    expect(features).toHaveLength(EXPECTED_FEATURES_COUNT);
     expect(features[0].title).toBe('Find Your Buddy');
     expect(features[1].title).toBe('Track Progress');
     expect(features[2].title).toBe('Stay Motivated');
 
-    features.forEach((feature) => {
+    for (const feature of features) {
       expect(feature.title.length).toBeGreaterThan(0);
       expect(feature.description.length).toBeGreaterThan(0);
       expect(feature.icon.length).toBeGreaterThan(0);
-    });
+    }
   });
 
   it('should have proper benefits list', () => {
@@ -45,11 +49,11 @@ describe('Landing Page Component', () => {
       'Build lasting habits with consistent support',
     ];
 
-    expect(benefits).toHaveLength(6);
-    benefits.forEach((benefit) => {
+    expect(benefits).toHaveLength(EXPECTED_BENEFITS_COUNT);
+    for (const benefit of benefits) {
       expect(benefit.length).toBeGreaterThan(0);
       expect(typeof benefit).toBe('string');
-    });
+    }
   });
 
   it('should handle authentication states correctly', () => {
@@ -70,6 +74,6 @@ describe('Landing Page Component', () => {
     expect(heroTitle.includes('Goals')).toBe(true);
     expect(heroTitle.includes('Accountability')).toBe(true);
     expect(heroDescription.includes('accountability partners')).toBe(true);
-    expect(heroDescription.length).toBeGreaterThan(100);
+    expect(heroDescription.length).toBeGreaterThan(MIN_HERO_DESCRIPTION_LENGTH);
   });
 });

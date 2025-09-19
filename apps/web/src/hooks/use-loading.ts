@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import { useErrorHandler } from './use-error-handler';
 
-interface UseLoadingOptions {
+type UseLoadingOptions = {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
   showErrorToast?: boolean;
   successMessage?: string;
-}
+};
 
 export function useLoading() {
   const [isLoading, setIsLoading] = useState(false);
@@ -58,11 +58,11 @@ export function useLoading() {
   );
 
   const createLoadingHandler = useCallback(
-    <T extends any[]>(
-      asyncFn: (...args: T) => Promise<any>,
+    <T extends unknown[]>(
+      asyncFn: (...args: T) => Promise<unknown>,
       options: UseLoadingOptions = {}
     ) => {
-      return async (...args: T) => {
+      return (...args: T) => {
         return withLoading(() => asyncFn(...args), options);
       };
     },

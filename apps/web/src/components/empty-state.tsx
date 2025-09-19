@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-interface EmptyStateProps {
+type EmptyStateProps = {
   icon: LucideIcon;
   title: string;
   description: string;
@@ -11,7 +11,7 @@ interface EmptyStateProps {
     onClick: () => void;
   };
   className?: string;
-}
+};
 
 export function EmptyState({
   icon: Icon,

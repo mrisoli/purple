@@ -5,14 +5,14 @@ import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface Props {
+type Props = {
   children: ReactNode;
-}
+};
 
-interface State {
+type State = {
   hasError: boolean;
   error?: Error;
-}
+};
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
@@ -23,16 +23,13 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // In production, you would log this to an error reporting service
-    console.error('Uncaught error:', error, errorInfo);
-  }
+  public componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {}
 
-  private handleRetry = () => {
+  private readonly handleRetry = () => {
     this.setState({ hasError: false, error: undefined });
   };
 
-  private handleReload = () => {
+  private readonly handleReload = () => {
     window.location.reload();
   };
 
