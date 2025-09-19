@@ -22,6 +22,113 @@ const createMockQuery = (data) => ({
   eq: vi.fn(),
 });
 
+// Helper functions to reduce cognitive complexity
+const getUserFromAuth = async (ctx: any) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new Error('Not authenticated');
+  }
+
+  const currentUser = await ctx.db
+    .query('users')
+    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .unique();
+
+  if (!currentUser) {
+    throw new Error('User not found');
+  }
+
+  return { identity, currentUser };
+};
+
+const checkProjectLimit = async (ctx: any, user: any) => {
+  if (!user.premium) {
+    const userProjects = await ctx.db
+      .query('projects')
+      .withIndex('by_owner', (q: any) => q.eq('ownerId', user._id))
+      .collect();
+
+    if (userProjects.length >= 1) {
+      throw new Error(
+        'Free users can only create 1 project. Upgrade to premium for unlimited projects.'
+      );
+    }
+  }
+};
+
+const createProjectMutation = async (ctx: any, args: any) => {
+  const { currentUser } = await getUserFromAuth(ctx);
+  await checkProjectLimit(ctx, currentUser);
+
+  const newProjectId = await ctx.db.insert('projects', {
+    ownerId: currentUser._id,
+    name: args.name,
+    description: args.description,
+    createdAt: Date.now(),
+  });
+
+  return await ctx.db.get(newProjectId);
+};
+
+const inviteBuddyMutation = async (ctx: any, args: any) => {
+  const { currentUser } = await getUserFromAuth(ctx);
+
+  const currentProject = await ctx.db.get(args.projectId);
+  if (!currentProject) {
+    throw new Error('Project not found');
+  }
+
+  if (currentProject.ownerId !== currentUser._id) {
+    throw new Error('Only project owner can invite buddies');
+  }
+
+  const invitedBuddy = await ctx.db
+    .query('users')
+    .filter((q: any) => q.eq(q.field('email'), args.buddyEmail))
+    .unique();
+
+  if (!invitedBuddy) {
+    throw new Error(
+      'User with this email not found. They need to sign up first.'
+    );
+  }
+
+  await ctx.db.patch(args.projectId, { buddyId: invitedBuddy._id });
+
+  return { success: true };
+};
+
+const getProjectQuery = async (ctx: any, args: any) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return null;
+  }
+
+  const currentProject = await ctx.db.get(args.projectId);
+  if (!currentProject) {
+    return null;
+  }
+
+  const currentUser = await ctx.db
+    .query('users')
+    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .unique();
+
+  if (!currentUser) {
+    return null;
+  }
+
+  // User can access project if they own it or are the buddy
+  if (
+    currentProject.ownerId === currentUser._id ||
+    currentProject.buddyId === currentUser._id
+  ) {
+    return currentProject;
+  }
+
+  return null;
+};
+
 type MockContext = {
   auth: {
     getUserIdentity: ReturnType<typeof vi.fn>;
@@ -48,7 +155,7 @@ describe('Projects Integration Tests', () => {
 
   describe('create mutation', () => {
     it('should create project for free user with no existing projects', async () => {
-      const user = {
+      const mockFreeUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
         premium: false,
@@ -56,7 +163,7 @@ describe('Projects Integration Tests', () => {
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(user)) // Find user
+        .mockReturnValueOnce(createMockQuery(mockFreeUser)) // Find user
         .mockReturnValueOnce(createMockQuery([])); // No existing projects
       mockCtx.db.insert.mockResolvedValue('new-project-id');
       mockCtx.db.get.mockResolvedValue({
@@ -67,44 +174,7 @@ describe('Projects Integration Tests', () => {
         createdAt: Date.now(),
       });
 
-      const create = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          throw new Error('Not authenticated');
-        }
-
-        const currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!currentUser) {
-          throw new Error('User not found');
-        }
-
-        // Check project limit for free users
-        if (!currentUser.premium) {
-          const userProjects = await ctx.db
-            .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
-            .collect();
-
-          if (userProjects.length >= 1) {
-            throw new Error(
-              'Free users can only create 1 project. Upgrade to premium for unlimited projects.'
-            );
-          }
-        }
-
-        const newProjectId = await ctx.db.insert('projects', {
-          ownerId: currentUser._id,
-          name: args.name,
-          description: args.description,
-          createdAt: Date.now(),
-        });
-
-        return await ctx.db.get(newProjectId);
-      };
+      const create = createProjectMutation;
 
       const result = await create(mockCtx, {
         name: 'Test Project',
@@ -121,13 +191,13 @@ describe('Projects Integration Tests', () => {
     });
 
     it('should reject project creation for free user with existing project', async () => {
-      const user = {
+      const mockLimitedUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
         premium: false,
       };
 
-      const existingProject = {
+      const mockExistingProject = {
         _id: 'existing-project',
         ownerId: 'user-123',
         name: 'Existing Project',
@@ -135,37 +205,12 @@ describe('Projects Integration Tests', () => {
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(user))
-        .mockReturnValueOnce(createMockQuery([existingProject]));
+        .mockReturnValueOnce(createMockQuery(mockLimitedUser))
+        .mockReturnValueOnce(createMockQuery([mockExistingProject]));
 
-      const create = async (ctx, _args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          throw new Error('Not authenticated');
-        }
-
-        const currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!currentUser) {
-          throw new Error('User not found');
-        }
-
-        if (!currentUser.premium) {
-          const userProjects = await ctx.db
-            .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
-            .collect();
-
-          if (userProjects.length >= 1) {
-            throw new Error(
-              'Free users can only create 1 project. Upgrade to premium for unlimited projects.'
-            );
-          }
-        }
-
+      const create = async (ctx: any, _args: any) => {
+        const { currentUser } = await getUserFromAuth(ctx);
+        await checkProjectLimit(ctx, currentUser);
         return null;
       };
 
@@ -178,13 +223,13 @@ describe('Projects Integration Tests', () => {
     });
 
     it('should allow unlimited projects for premium user', async () => {
-      const user = {
+      const mockPremiumUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
         premium: true,
       };
 
-      const existingProjects = [
+      const mockExistingProjects = [
         { _id: 'project-1', name: 'Project 1' },
         { _id: 'project-2', name: 'Project 2' },
         { _id: 'project-3', name: 'Project 3' },
@@ -192,41 +237,15 @@ describe('Projects Integration Tests', () => {
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(user))
-        .mockReturnValueOnce(createMockQuery(existingProjects));
+        .mockReturnValueOnce(createMockQuery(mockPremiumUser))
+        .mockReturnValueOnce(createMockQuery(mockExistingProjects));
       mockCtx.db.insert.mockResolvedValue('new-project-id');
       mockCtx.db.get.mockResolvedValue({
         _id: 'new-project-id',
         name: 'Project 4',
       });
 
-      const create = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        const currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!currentUser.premium) {
-          const userProjects = await ctx.db
-            .query('projects')
-            .withIndex('by_owner', (q) => q.eq('ownerId', currentUser._id))
-            .collect();
-
-          if (userProjects.length >= 1) {
-            throw new Error('Free users can only create 1 project');
-          }
-        }
-
-        const newProjectId = await ctx.db.insert('projects', {
-          ownerId: currentUser._id,
-          name: args.name,
-          description: args.description,
-          createdAt: Date.now(),
-        });
-
-        return await ctx.db.get(newProjectId);
-      };
+      const create = createProjectMutation;
 
       const result = await create(mockCtx, {
         name: 'Project 4',
@@ -240,65 +259,31 @@ describe('Projects Integration Tests', () => {
 
   describe('inviteBuddy mutation', () => {
     it('should successfully invite existing user as buddy', async () => {
-      const project = {
+      const mockInviteProject = {
         _id: 'project-123',
         ownerId: 'user-123',
         name: 'Test Project',
       };
 
-      const owner = {
+      const mockOwner = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
-      const buddy = {
+      const mockBuddy = {
         _id: 'buddy-123',
         email: 'buddy@example.com',
         name: 'Buddy User',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
+      mockCtx.db.get.mockResolvedValue(mockInviteProject);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(owner))
-        .mockReturnValueOnce(createMockQuery(buddy));
+        .mockReturnValueOnce(createMockQuery(mockOwner))
+        .mockReturnValueOnce(createMockQuery(mockBuddy));
       mockCtx.db.patch.mockResolvedValue(undefined);
 
-      const inviteBuddy = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          throw new Error('Not authenticated');
-        }
-
-        const currentProject = await ctx.db.get(args.projectId);
-        if (!currentProject) {
-          throw new Error('Project not found');
-        }
-
-        const _currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
-          throw new Error('Only project owner can invite buddies');
-        }
-
-        const invitedBuddy = await ctx.db
-          .query('users')
-          .filter((q) => q.eq(q.field('email'), args.buddyEmail))
-          .unique();
-
-        if (!invitedBuddy) {
-          throw new Error(
-            'User with this email not found. They need to sign up first.'
-          );
-        }
-
-        await ctx.db.patch(args.projectId, { buddyId: invitedBuddy._id });
-
-        return { success: true };
-      };
+      const inviteBuddy = inviteBuddyMutation;
 
       const result = await inviteBuddy(mockCtx, {
         projectId: 'project-123',
@@ -312,30 +297,26 @@ describe('Projects Integration Tests', () => {
     });
 
     it('should reject buddy invitation from non-owner', async () => {
-      const project = {
+      const mockRestrictedProject = {
         _id: 'project-123',
         ownerId: 'user-456',
         name: 'Test Project',
       };
 
-      const nonOwner = {
+      const mockNonOwner = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
-      mockCtx.db.query.mockReturnValueOnce(createMockQuery(nonOwner));
+      mockCtx.db.get.mockResolvedValue(mockRestrictedProject);
+      mockCtx.db.query.mockReturnValueOnce(createMockQuery(mockNonOwner));
 
-      const inviteBuddy = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+      const inviteBuddy = async (ctx: any, args: any) => {
+        const { currentUser } = await getUserFromAuth(ctx);
         const currentProject = await ctx.db.get(args.projectId);
-        const _currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
 
-        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
+        if (currentProject.ownerId !== currentUser._id) {
           throw new Error('Only project owner can invite buddies');
         }
 
@@ -351,37 +332,33 @@ describe('Projects Integration Tests', () => {
     });
 
     it('should reject invitation for non-existent buddy', async () => {
-      const project = {
+      const mockNonExistentProject = {
         _id: 'project-123',
         ownerId: 'user-123',
       };
 
-      const owner = {
+      const mockProjectOwner = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
+      mockCtx.db.get.mockResolvedValue(mockNonExistentProject);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(owner))
+        .mockReturnValueOnce(createMockQuery(mockProjectOwner))
         .mockReturnValueOnce(createMockQuery(null)); // Buddy not found
 
-      const inviteBuddy = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+      const inviteBuddy = async (ctx: any, args: any) => {
+        const { currentUser } = await getUserFromAuth(ctx);
         const currentProject = await ctx.db.get(args.projectId);
-        const _currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
 
-        if (!_currentUser || currentProject.ownerId !== _currentUser._id) {
+        if (currentProject.ownerId !== currentUser._id) {
           throw new Error('Only project owner can invite buddies');
         }
 
         const invitedBuddy = await ctx.db
           .query('users')
-          .filter((q) => q.eq(q.field('email'), args.buddyEmail))
+          .filter((q: any) => q.eq(q.field('email'), args.buddyEmail))
           .unique();
 
         if (!invitedBuddy) {
@@ -404,84 +381,57 @@ describe('Projects Integration Tests', () => {
 
   describe('get query', () => {
     it('should return project for owner', async () => {
-      const project = {
+      const mockAccessibleProject = {
         _id: 'project-123',
         ownerId: 'user-123',
         name: 'Test Project',
       };
 
-      const user = {
+      const mockProjectUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.get.mockResolvedValue(mockAccessibleProject);
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockProjectUser));
 
-      const get = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          return null;
-        }
-
-        const currentProject = await ctx.db.get(args.projectId);
-        if (!currentProject) {
-          return null;
-        }
-
-        const _currentUser = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!_currentUser) {
-          return null;
-        }
-
-        // User can access project if they own it or are the buddy
-        if (
-          currentProject.ownerId === _currentUser._id ||
-          currentProject.buddyId === _currentUser._id
-        ) {
-          return currentProject;
-        }
-
-        return null;
-      };
+      const get = getProjectQuery;
 
       const result = await get(mockCtx, { projectId: 'project-123' });
 
-      expect(result).toEqual(project);
+      expect(result).toEqual(mockAccessibleProject);
     });
 
     it('should return null for unauthorized user', async () => {
-      const project = {
+      const mockInaccessibleProject = {
         _id: 'project-123',
         ownerId: 'user-456',
         buddyId: 'user-789',
       };
 
-      const user = {
+      const mockUnauthorizedUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.get.mockResolvedValue(mockInaccessibleProject);
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockUnauthorizedUser));
 
-      const get = async (ctx, args) => {
+      const get = async (ctx: any, args: any) => {
         const identity = await ctx.auth.getUserIdentity();
         const currentProject = await ctx.db.get(args.projectId);
-        const _currentUser = await ctx.db
+        const currentUser = await ctx.db
           .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
+          .withIndex('by_clerkId', (q: any) =>
+            q.eq('clerkId', identity.subject)
+          )
           .unique();
 
         if (
-          currentProject.ownerId === _currentUser._id ||
-          currentProject.buddyId === _currentUser._id
+          currentProject.ownerId === currentUser._id ||
+          currentProject.buddyId === currentUser._id
         ) {
           return currentProject;
         }

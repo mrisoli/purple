@@ -21,8 +21,154 @@ const createMockQuery = (data) => ({
   eq: vi.fn(),
 });
 
+// Helper functions to reduce cognitive complexity
+const getUserFromContext = async (ctx: any) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new Error('Not authenticated');
+  }
+
+  const user = await ctx.db
+    .query('users')
+    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .unique();
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return { identity, user };
+};
+
+const validateProjectAccess = (project: any, user: any) => {
+  if (!project) {
+    throw new Error('Project not found');
+  }
+
+  if (project.ownerId !== user._id && project.buddyId !== user._id) {
+    throw new Error('Only project owner or buddy can create actions');
+  }
+};
+
+const createActionMutation = async (ctx: any, args: any) => {
+  const { user } = await getUserFromContext(ctx);
+  const project = await ctx.db.get(args.projectId);
+
+  validateProjectAccess(project, user);
+
+  const newActionId = await ctx.db.insert('actions', {
+    projectId: args.projectId,
+    userId: user._id,
+    type: args.type,
+    message: args.message,
+    createdAt: Date.now(),
+  });
+
+  return await ctx.db.get(newActionId);
+};
+
+const listActionsByProject = async (ctx: any, args: any) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return [];
+  }
+
+  const project = await ctx.db.get(args.projectId);
+  if (!project) {
+    return [];
+  }
+
+  const user = await ctx.db
+    .query('users')
+    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .unique();
+
+  if (!user) {
+    return [];
+  }
+
+  // User can access actions if they own the project or are the buddy
+  if (project.ownerId !== user._id && project.buddyId !== user._id) {
+    return [];
+  }
+
+  const actions = await ctx.db
+    .query('actions')
+    .withIndex('by_project', (q: any) => q.eq('projectId', args.projectId))
+    .collect();
+
+  // Get user info for each action
+  const actionsWithUsers = await Promise.all(
+    actions.map(async (action: any) => {
+      const actionUser = await ctx.db.get(action.userId);
+      return {
+        ...action,
+        user: actionUser,
+      };
+    })
+  );
+
+  return actionsWithUsers.sort((a: any, b: any) => b.createdAt - a.createdAt);
+};
+
+const getRecentActionsQuery = async (ctx: any) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return [];
+  }
+
+  const user = await ctx.db
+    .query('users')
+    .withIndex('by_clerkId', (q: any) => q.eq('clerkId', identity.subject))
+    .unique();
+
+  if (!user) {
+    return [];
+  }
+
+  // Get user's projects
+  const ownedProjects = await ctx.db
+    .query('projects')
+    .withIndex('by_owner', (q: any) => q.eq('ownerId', user._id))
+    .collect();
+
+  // Get projects where user is a buddy
+  const allProjects = await ctx.db.query('projects').collect();
+  const buddyProjects = allProjects.filter((p: any) => p.buddyId === user._id);
+
+  const userProjectIds = [
+    ...ownedProjects.map((p: any) => p._id),
+    ...buddyProjects.map((p: any) => p._id),
+  ];
+
+  // Get recent actions from all user's projects
+  const allActions = await ctx.db.query('actions').collect();
+  const userActions = allActions.filter((action: any) =>
+    userProjectIds.includes(action.projectId)
+  );
+
+  // Get user info and project info for each action
+  const actionsWithDetails = await Promise.all(
+    userActions.map(async (action: any) => {
+      const [actionUser, project] = await Promise.all([
+        ctx.db.get(action.userId),
+        ctx.db.get(action.projectId),
+      ]);
+      return {
+        ...action,
+        user: actionUser,
+        project,
+      };
+    })
+  );
+
+  return actionsWithDetails
+    .sort((a: any, b: any) => b.createdAt - a.createdAt)
+    .slice(0, 10); // Return 10 most recent actions
+};
+
 describe('Actions Integration Tests', () => {
-  let mockCtx;
+  let mockCtx: ReturnType<typeof createMockContext>;
   const mockIdentity = {
     subject: 'clerk-123',
     email: 'test@example.com',
@@ -35,13 +181,13 @@ describe('Actions Integration Tests', () => {
 
   describe('create mutation', () => {
     it('should create action for project owner', async () => {
-      const project = {
+      const mockProject = {
         _id: 'project-123',
         ownerId: 'user-123',
         name: 'Test Project',
       };
 
-      const user = {
+      const mockUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
@@ -57,46 +203,12 @@ describe('Actions Integration Tests', () => {
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.get
-        .mockResolvedValueOnce(project)
+        .mockResolvedValueOnce(mockProject)
         .mockResolvedValueOnce(newAction);
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockUser));
       mockCtx.db.insert.mockResolvedValue('action-123');
 
-      const create = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          throw new Error('Not authenticated');
-        }
-
-        const project = await ctx.db.get(args.projectId);
-        if (!project) {
-          throw new Error('Project not found');
-        }
-
-        const user = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!user) {
-          throw new Error('User not found');
-        }
-
-        // User can create actions if they own the project or are the buddy
-        if (project.ownerId !== user._id && project.buddyId !== user._id) {
-          throw new Error('Only project owner or buddy can create actions');
-        }
-
-        const newActionId = await ctx.db.insert('actions', {
-          projectId: args.projectId,
-          userId: user._id,
-          type: args.type,
-          message: args.message,
-          createdAt: Date.now(),
-        });
-
-        return await ctx.db.get(newActionId);
-      };
+      const create = createActionMutation;
 
       const result = await create(mockCtx, {
         projectId: 'project-123',
@@ -115,48 +227,29 @@ describe('Actions Integration Tests', () => {
     });
 
     it('should create action for project buddy', async () => {
-      const project = {
+      const mockBuddyProject = {
         _id: 'project-123',
         ownerId: 'user-456',
         buddyId: 'user-123',
         name: 'Test Project',
       };
 
-      const user = {
+      const mockBuddyUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValueOnce(project).mockResolvedValueOnce({
-        _id: 'action-123',
-        type: 'milestone_reached',
-      });
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.get
+        .mockResolvedValueOnce(mockBuddyProject)
+        .mockResolvedValueOnce({
+          _id: 'action-123',
+          type: 'milestone_reached',
+        });
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockBuddyUser));
       mockCtx.db.insert.mockResolvedValue('action-123');
 
-      const create = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        const project = await ctx.db.get(args.projectId);
-        const user = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (project.ownerId !== user._id && project.buddyId !== user._id) {
-          throw new Error('Only project owner or buddy can create actions');
-        }
-
-        const newActionId = await ctx.db.insert('actions', {
-          projectId: args.projectId,
-          userId: user._id,
-          type: args.type,
-          message: args.message,
-          createdAt: Date.now(),
-        });
-
-        return await ctx.db.get(newActionId);
-      };
+      const create = createActionMutation;
 
       const result = await create(mockCtx, {
         projectId: 'project-123',
@@ -169,33 +262,25 @@ describe('Actions Integration Tests', () => {
     });
 
     it('should reject action creation for unauthorized user', async () => {
-      const project = {
+      const mockUnauthorizedProject = {
         _id: 'project-123',
         ownerId: 'user-456',
         buddyId: 'user-789',
       };
 
-      const user = {
+      const mockUnauthorizedUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.get.mockResolvedValue(mockUnauthorizedProject);
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockUnauthorizedUser));
 
-      const create = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
+      const create = async (ctx: any, args: any) => {
+        const { user } = await getUserFromContext(ctx);
         const project = await ctx.db.get(args.projectId);
-        const user = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (project.ownerId !== user._id && project.buddyId !== user._id) {
-          throw new Error('Only project owner or buddy can create actions');
-        }
-
+        validateProjectAccess(project, user);
         return null;
       };
 
@@ -211,17 +296,17 @@ describe('Actions Integration Tests', () => {
 
   describe('listByProject query', () => {
     it('should return actions for project owner', async () => {
-      const project = {
+      const mockOwnerProject = {
         _id: 'project-123',
         ownerId: 'user-123',
       };
 
-      const user = {
+      const mockOwnerUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
-      const actions = [
+      const mockActions = [
         {
           _id: 'action-1',
           projectId: 'project-123',
@@ -238,63 +323,21 @@ describe('Actions Integration Tests', () => {
         },
       ];
 
-      const actionUsers = [
+      const mockActionUsers = [
         { _id: 'user-123', name: 'Test User' },
         { _id: 'user-123', name: 'Test User' },
       ];
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.get
-        .mockResolvedValueOnce(project)
-        .mockResolvedValueOnce(actionUsers[0])
-        .mockResolvedValueOnce(actionUsers[1]);
+        .mockResolvedValueOnce(mockOwnerProject)
+        .mockResolvedValueOnce(mockActionUsers[0])
+        .mockResolvedValueOnce(mockActionUsers[1]);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(user))
-        .mockReturnValueOnce(createMockQuery(actions));
+        .mockReturnValueOnce(createMockQuery(mockOwnerUser))
+        .mockReturnValueOnce(createMockQuery(mockActions));
 
-      const listByProject = async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          return [];
-        }
-
-        const project = await ctx.db.get(args.projectId);
-        if (!project) {
-          return [];
-        }
-
-        const user = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!user) {
-          return [];
-        }
-
-        // User can access actions if they own the project or are the buddy
-        if (project.ownerId !== user._id && project.buddyId !== user._id) {
-          return [];
-        }
-
-        const actions = await ctx.db
-          .query('actions')
-          .withIndex('by_project', (q) => q.eq('projectId', args.projectId))
-          .collect();
-
-        // Get user info for each action
-        const actionsWithUsers = await Promise.all(
-          actions.map(async (action) => {
-            const actionUser = await ctx.db.get(action.userId);
-            return {
-              ...action,
-              user: actionUser,
-            };
-          })
-        );
-
-        return actionsWithUsers.sort((a, b) => b.createdAt - a.createdAt);
-      };
+      const listByProject = listActionsByProject;
 
       const result = await listByProject(mockCtx, { projectId: 'project-123' });
 
@@ -305,27 +348,29 @@ describe('Actions Integration Tests', () => {
     });
 
     it('should return empty array for unauthorized user', async () => {
-      const project = {
+      const mockRestrictedProject = {
         _id: 'project-123',
         ownerId: 'user-456',
         buddyId: 'user-789',
       };
 
-      const user = {
+      const mockRestrictedUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get.mockResolvedValue(project);
-      mockCtx.db.query.mockReturnValue(createMockQuery(user));
+      mockCtx.db.get.mockResolvedValue(mockRestrictedProject);
+      mockCtx.db.query.mockReturnValue(createMockQuery(mockRestrictedUser));
 
-      const listByProject = async (ctx, args) => {
+      const listByProject = async (ctx: any, args: any) => {
         const identity = await ctx.auth.getUserIdentity();
         const project = await ctx.db.get(args.projectId);
         const user = await ctx.db
           .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
+          .withIndex('by_clerkId', (q: any) =>
+            q.eq('clerkId', identity.subject)
+          )
           .unique();
 
         if (project.ownerId !== user._id && project.buddyId !== user._id) {
@@ -343,23 +388,23 @@ describe('Actions Integration Tests', () => {
 
   describe('getRecentActions query', () => {
     it('should return recent actions from user projects', async () => {
-      const user = {
+      const mockCurrentUser = {
         _id: 'user-123',
         clerkId: 'clerk-123',
       };
 
-      const ownedProjects = [
+      const mockOwnedProjects = [
         { _id: 'project-1', ownerId: 'user-123' },
         { _id: 'project-2', ownerId: 'user-123' },
       ];
 
-      const allProjects = [
+      const mockAllProjects = [
         { _id: 'project-1', ownerId: 'user-123', buddyId: null },
         { _id: 'project-2', ownerId: 'user-123', buddyId: null },
         { _id: 'project-3', ownerId: 'user-456', buddyId: 'user-123' },
       ];
 
-      const allActions = [
+      const mockAllActions = [
         {
           _id: 'action-1',
           projectId: 'project-1',
@@ -382,10 +427,10 @@ describe('Actions Integration Tests', () => {
 
       mockCtx = createMockContext(mockIdentity);
       mockCtx.db.query
-        .mockReturnValueOnce(createMockQuery(user))
-        .mockReturnValueOnce(createMockQuery(ownedProjects))
-        .mockReturnValueOnce(createMockQuery(allProjects))
-        .mockReturnValueOnce(createMockQuery(allActions));
+        .mockReturnValueOnce(createMockQuery(mockCurrentUser))
+        .mockReturnValueOnce(createMockQuery(mockOwnedProjects))
+        .mockReturnValueOnce(createMockQuery(mockAllProjects))
+        .mockReturnValueOnce(createMockQuery(mockAllActions));
 
       // Mock getting user and project details
       mockCtx.db.get
@@ -394,61 +439,7 @@ describe('Actions Integration Tests', () => {
         .mockResolvedValueOnce({ _id: 'user-456', name: 'Buddy User' })
         .mockResolvedValueOnce({ _id: 'project-3', name: 'Project 3' });
 
-      const getRecentActions = async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-          return [];
-        }
-
-        const user = await ctx.db
-          .query('users')
-          .withIndex('by_clerkId', (q) => q.eq('clerkId', identity.subject))
-          .unique();
-
-        if (!user) {
-          return [];
-        }
-
-        // Get user's projects
-        const ownedProjects = await ctx.db
-          .query('projects')
-          .withIndex('by_owner', (q) => q.eq('ownerId', user._id))
-          .collect();
-
-        // Get projects where user is a buddy
-        const allProjects = await ctx.db.query('projects').collect();
-        const buddyProjects = allProjects.filter((p) => p.buddyId === user._id);
-
-        const userProjectIds = [
-          ...ownedProjects.map((p) => p._id),
-          ...buddyProjects.map((p) => p._id),
-        ];
-
-        // Get recent actions from all user's projects
-        const allActions = await ctx.db.query('actions').collect();
-        const userActions = allActions.filter((action) =>
-          userProjectIds.includes(action.projectId)
-        );
-
-        // Get user info and project info for each action
-        const actionsWithDetails = await Promise.all(
-          userActions.map(async (action) => {
-            const [actionUser, project] = await Promise.all([
-              ctx.db.get(action.userId),
-              ctx.db.get(action.projectId),
-            ]);
-            return {
-              ...action,
-              user: actionUser,
-              project,
-            };
-          })
-        );
-
-        return actionsWithDetails
-          .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, 10); // Return 10 most recent actions
-      };
+      const getRecentActions = getRecentActionsQuery;
 
       const result = await getRecentActions(mockCtx);
 
@@ -462,7 +453,7 @@ describe('Actions Integration Tests', () => {
     it('should return empty array for unauthenticated user', async () => {
       mockCtx = createMockContext(null);
 
-      const getRecentActions = async (ctx) => {
+      const getRecentActions = async (ctx: any) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
           return [];
