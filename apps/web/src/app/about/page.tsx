@@ -14,36 +14,36 @@ import {
 
 export default function AboutPage() {
   const stats = [
-    { number: '10,000+', label: 'Happy Users' },
-    { number: '50+', label: 'Countries' },
-    { number: '99.9%', label: 'Uptime' },
-    { number: '24/7', label: 'Support' },
+    { number: '5,000+', label: 'Goal Achievers' },
+    { number: '2,500+', label: 'Buddy Pairs' },
+    { number: '85%', label: 'Success Rate' },
+    { number: '10,000+', label: 'Goals Completed' },
   ] as const;
 
   const values = [
     {
       icon: Target,
-      title: 'Mission-Driven',
+      title: 'Goal-Focused',
       description:
-        "We're committed to helping individuals and teams achieve their full potential through innovative productivity solutions.",
+        "We believe everyone has the potential to achieve their dreams with the right support and accountability.",
     },
     {
       icon: Users,
-      title: 'User-Centric',
+      title: 'Community-Driven',
       description:
-        'Every feature we build is designed with our users in mind. Your feedback drives our product development.',
+        'Success is better when shared. We foster a supportive community where accountability partners thrive together.',
     },
     {
       icon: Award,
-      title: 'Excellence',
+      title: 'Achievement-Oriented',
       description:
-        'We strive for excellence in everything we do, from product quality to customer service.',
+        'We celebrate every milestone, big or small, because progress deserves recognition and motivation.',
     },
     {
       icon: Heart,
-      title: 'Passionate',
+      title: 'Supportive',
       description:
-        "We're passionate about creating tools that make work more enjoyable and meaningful.",
+        "We're passionate about creating meaningful connections that help people stay committed to their goals.",
     },
   ] as const;
 
@@ -52,23 +52,23 @@ export default function AboutPage() {
       name: 'Alex Johnson',
       role: 'CEO & Founder',
       background:
-        'Former product manager at Google with 8+ years building productivity tools',
+        'Life coach and accountability expert with 8+ years helping people achieve their goals',
     },
     {
       name: 'Sarah Chen',
       role: 'CTO',
       background:
-        'Ex-Microsoft engineer, specialized in scalable systems and user experience',
+        'Ex-Microsoft engineer, specialized in building community-driven platforms',
     },
     {
       name: 'David Rodriguez',
       role: 'Head of Design',
-      background: 'Award-winning designer with experience at Apple and Spotify',
+      background: 'UX designer focused on motivational and behavior-change applications',
     },
     {
       name: 'Emma Williams',
-      role: 'VP of Customer Success',
-      background: 'Customer experience expert with 10+ years in SaaS companies',
+      role: 'Community Manager',
+      background: 'Psychology background with expertise in peer support and accountability systems',
     },
   ] as const;
 
@@ -77,12 +77,12 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="space-y-6 py-16 text-center">
         <h1 className="font-bold text-4xl tracking-tight lg:text-6xl">
-          About Purple
+          About Our Mission
         </h1>
         <p className="mx-auto max-w-3xl text-muted-foreground text-xl">
-          We're building the future of productivity. Our mission is to help
-          people and teams work more efficiently, collaborate better, and
-          achieve extraordinary results.
+          We're building the future of accountability. Our mission is to help
+          people achieve their goals through meaningful partnerships, consistent
+          support, and proven accountability systems.
         </p>
       </section>
 
@@ -105,40 +105,40 @@ export default function AboutPage() {
             <h2 className="font-bold text-3xl">Our Story</h2>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                Purple was founded in 2022 when our team experienced firsthand
-                the frustration of juggling multiple productivity tools that
-                didn't work well together. We knew there had to be a better way.
+                Our platform was founded in 2022 when our team experienced firsthand
+                the challenge of staying accountable to personal goals. We realized
+                that having the right accountability partner could make all the difference
+                between giving up and achieving success.
               </p>
               <p>
-                Starting with a simple idea—what if productivity tools were
-                actually intuitive and enjoyable to use?—we set out to build
-                something different. We wanted to create a platform that would
-                adapt to how people naturally work, not the other way around.
+                Starting with a simple idea—what if accountability was as easy as
+                finding a workout buddy?—we set out to build something different. 
+                We wanted to create a platform that would connect people with shared
+                goals and provide the tools they need to support each other.
               </p>
               <p>
-                Today, thousands of individuals and teams around the world use
-                Purple to streamline their workflows, collaborate more
-                effectively, and achieve their goals. We're just getting
-                started.
+                Today, thousands of goal-oriented individuals around the world use
+                our platform to find accountability partners, track their progress,
+                and achieve their most important goals. We're just getting started.
               </p>
             </div>
           </div>
           <div className="space-y-4 rounded-lg bg-muted/30 p-8 text-center">
             <h3 className="font-semibold text-2xl">Founded in 2022</h3>
             <p className="text-muted-foreground">
-              Born from the belief that productivity tools should empower, not
-              overwhelm.
+              Born from the belief that accountability partnerships can transform
+              lives and help people achieve their biggest dreams.
             </p>
             <div className="flex justify-center gap-4 pt-4">
               <div className="text-center">
-                <div className="font-bold text-lg text-primary">Series A</div>
-                <div className="text-muted-foreground text-sm">Funding</div>
+                <div className="font-bold text-lg text-primary">Community</div>
+                <div className="text-muted-foreground text-sm">Driven</div>
               </div>
               <div className="text-center">
                 <div className="font-bold text-lg text-primary">
-                  Remote-First
+                  Goal-Focused
                 </div>
-                <div className="text-muted-foreground text-sm">Company</div>
+                <div className="text-muted-foreground text-sm">Platform</div>
               </div>
             </div>
           </div>
@@ -201,16 +201,15 @@ export default function AboutPage() {
         <div className="mx-auto max-w-4xl space-y-6">
           <h2 className="font-bold text-3xl">Our Mission</h2>
           <blockquote className="text-muted-foreground text-xl italic">
-            "To empower individuals and teams worldwide with intuitive, powerful
-            tools that unlock their full potential and help them create
-            meaningful impact in their work and lives."
+            "To empower individuals worldwide with meaningful accountability partnerships
+            that unlock their potential and help them achieve their most important goals
+            through consistent support and shared commitment."
           </blockquote>
           <div className="pt-6">
             <p className="text-muted-foreground">
-              We believe that when people have the right tools, they can
-              accomplish extraordinary things. That's why we're committed to
-              continuous innovation and putting our users at the heart of
-              everything we do.
+              We believe that when people have the right accountability partner, they can
+              accomplish extraordinary things. That's why we're committed to building
+              the best platform for creating lasting accountability relationships.
             </p>
           </div>
         </div>
@@ -218,10 +217,10 @@ export default function AboutPage() {
 
       {/* CTA Section */}
       <section className="space-y-6 py-16 text-center">
-        <h2 className="font-bold text-3xl">Join Our Journey</h2>
+        <h2 className="font-bold text-3xl">Start Your Accountability Journey</h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
-          Ready to experience the future of productivity? Join thousands of
-          users who have already transformed how they work.
+          Ready to achieve your goals with the power of accountability? Join thousands of
+          goal achievers who have transformed their lives with the right support.
         </p>
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <Authenticated>
