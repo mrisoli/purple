@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -54,6 +55,7 @@ export default function Dashboard() {
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectName.trim()) {
+      toast.error('Please enter a project name');
       return;
     }
 
@@ -65,8 +67,14 @@ export default function Dashboard() {
       setProjectName('');
       setProjectDescription('');
       setShowCreateForm(false);
-    } catch (_error) {
-      // In a real app, we'd show a toast/notification here
+      toast.success('Project created successfully!');
+    } catch (error) {
+      console.error('Error creating project:', error);
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : 'Failed to create project. Please try again.'
+      );
     }
   };
 

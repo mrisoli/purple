@@ -24,6 +24,7 @@ import {
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -63,6 +64,7 @@ export default function ProjectPage() {
   const handleInviteBuddy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!buddyEmail.trim()) {
+      toast.error('Please enter a buddy email address');
       return;
     }
 
@@ -73,14 +75,21 @@ export default function ProjectPage() {
       });
       setBuddyEmail('');
       setShowInviteForm(false);
-    } catch (_error) {
-      // In a real app, we'd show a toast/notification here
+      toast.success('Buddy invited successfully!');
+    } catch (error) {
+      console.error('Error inviting buddy:', error);
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : 'Failed to invite buddy. Please try again.'
+      );
     }
   };
 
   const handleCreateAction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!actionMessage.trim()) {
+      toast.error('Please enter a message for your progress update');
       return;
     }
 
@@ -92,8 +101,14 @@ export default function ProjectPage() {
       });
       setActionMessage('');
       setShowActionForm(false);
-    } catch (_error) {
-      // In a real app, we'd show a toast/notification here
+      toast.success('Progress logged successfully!');
+    } catch (error) {
+      console.error('Error creating action:', error);
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : 'Failed to log progress. Please try again.'
+      );
     }
   };
 
