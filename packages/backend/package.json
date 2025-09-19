@@ -11,11 +11,11 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@types/node": "^24.5.1",
+    "@types/node": "^24.5.2",
     "typescript": "^5.9.2",
     "vitest": "^1.6.1"
   },
   "dependencies": {
-    "convex": "^1.27.0"
+    "convex": "^1.27.1"
   }
 }
