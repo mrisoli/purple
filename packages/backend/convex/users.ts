@@ -83,7 +83,9 @@ export const updateStripeCustomerId = mutation({
     stripeCustomerId: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.userId, { stripeCustomerId: args.stripeCustomerId });
+    await ctx.db.patch(args.userId, {
+      stripeCustomerId: args.stripeCustomerId,
+    });
     return { success: true };
   },
 });

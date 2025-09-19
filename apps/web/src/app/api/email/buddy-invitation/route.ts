@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { api } from '@purple/backend/convex/_generated/api';
 import { ConvexHttpClient } from 'convex/browser';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { sendBuddyInvitationEmail } from '@/lib/email';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { projectId, buddyEmail } = body;
 
-    if (!projectId || !buddyEmail) {
+    if (!(projectId && buddyEmail)) {
       return NextResponse.json(
         { error: 'Project ID and buddy email are required' },
         { status: 400 }
@@ -26,10 +26,14 @@ export async function POST(request: NextRequest) {
     // Get project details and user info from Convex
     const [project, currentUser] = await Promise.all([
       convex.query(api.projects.get, { projectId }),
-      convex.query(api.users.current, {}, { jwt: await fetch('/api/convex-jwt').then(r => r.text()) }),
+      convex.query(
+        api.users.current,
+        {},
+        { jwt: await fetch('/api/convex-jwt').then((r) => r.text()) }
+      ),
     ]);
 
-    if (!project || !currentUser) {
+    if (!(project && currentUser)) {
       return NextResponse.json(
         { error: 'Project or user not found' },
         { status: 404 }
@@ -45,10 +49,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if buddy user exists
-    const buddyUser = await convex.query(api.users.findByEmail, { email: buddyEmail });
+    const buddyUser = await convex.query(api.users.findByEmail, {
+      email: buddyEmail,
+    });
 
     // Create invitation link
-    const inviteLink = buddyUser 
+    const inviteLink = buddyUser
       ? `${request.headers.get('origin')}/projects/${projectId}?invited=true`
       : `${request.headers.get('origin')}/sign-up?invite=${projectId}&email=${encodeURIComponent(buddyEmail)}`;
 
@@ -63,19 +69,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!emailResult.success) {
-      console.error('Failed to send buddy invitation email:', emailResult.error);
+      console.error(
+        'Failed to send buddy invitation email:',
+        emailResult.error
+      );
       return NextResponse.json(
         { error: 'Failed to send invitation email' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Buddy invitation sent successfully',
       hasAccount: !!buddyUser,
     });
-
   } catch (error) {
     console.error('Error sending buddy invitation:', error);
     return NextResponse.json(

@@ -95,11 +95,13 @@ export default function ProjectPage() {
       if (emailResult.success) {
         toast.success(
           emailResult.hasAccount
-            ? 'Buddy invited successfully! They\'ll receive an email notification.'
-            : 'Invitation sent! They\'ll receive an email with instructions to join.'
+            ? "Buddy invited successfully! They'll receive an email notification."
+            : "Invitation sent! They'll receive an email with instructions to join."
         );
       } else {
-        toast.success('Buddy invited successfully! (Email notification failed to send)');
+        toast.success(
+          'Buddy invited successfully! (Email notification failed to send)'
+        );
         console.warn('Email send failed:', emailResult.error);
       }
     } catch (error) {

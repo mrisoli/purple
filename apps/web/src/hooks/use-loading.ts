@@ -28,7 +28,7 @@ export function useLoading() {
 
       try {
         const result = await asyncFn();
-        
+
         if (onSuccess) {
           onSuccess();
         }

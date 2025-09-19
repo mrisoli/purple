@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock Convex environment
 const createMockContext = (identity = null) => ({
@@ -102,7 +102,7 @@ describe('Users Integration Tests', () => {
         email: 'test@example.com',
         name: 'Test User',
         premium: true,
-        createdAt: Date.now() - 10000,
+        createdAt: Date.now() - 10_000,
       };
 
       mockCtx = createMockContext(identity);
@@ -162,7 +162,9 @@ describe('Users Integration Tests', () => {
 
       const result = await upgradeToPremium(mockCtx, { userId: 'user-123' });
 
-      expect(mockCtx.db.patch).toHaveBeenCalledWith('user-123', { premium: true });
+      expect(mockCtx.db.patch).toHaveBeenCalledWith('user-123', {
+        premium: true,
+      });
       expect(result.success).toBe(true);
     });
   });
@@ -201,7 +203,9 @@ describe('Users Integration Tests', () => {
           .unique();
       };
 
-      const result = await findByEmail(mockCtx, { email: 'nonexistent@example.com' });
+      const result = await findByEmail(mockCtx, {
+        email: 'nonexistent@example.com',
+      });
 
       expect(result).toBeNull();
     });

@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
-import { action } from './_generated/server';
 import { internal } from './_generated/api';
+import { action } from './_generated/server';
 
 // Handle successful payment from Stripe webhook
 export const handleSuccessfulPayment = action({
@@ -68,8 +68,10 @@ export const handleFailedPayment = action({
     if (user) {
       // Log the failed payment but don't immediately downgrade
       // This could be enhanced to implement grace periods, retry logic, etc.
-      console.log(`Payment failed for user ${user._id}, invoice ${args.invoiceId}`);
-      
+      console.log(
+        `Payment failed for user ${user._id}, invoice ${args.invoiceId}`
+      );
+
       // For now, we'll keep the user premium but this could be extended
       // to implement grace periods or immediate downgrades based on business rules
       return { success: true, userId: user._id, action: 'logged_failure' };

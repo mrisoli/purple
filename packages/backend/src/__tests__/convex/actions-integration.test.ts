@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock Convex environment
 const createMockContext = (identity = null) => ({
@@ -128,12 +128,10 @@ describe('Actions Integration Tests', () => {
       };
 
       mockCtx = createMockContext(mockIdentity);
-      mockCtx.db.get
-        .mockResolvedValueOnce(project)
-        .mockResolvedValueOnce({
-          _id: 'action-123',
-          type: 'milestone_reached',
-        });
+      mockCtx.db.get.mockResolvedValueOnce(project).mockResolvedValueOnce({
+        _id: 'action-123',
+        type: 'milestone_reached',
+      });
       mockCtx.db.query.mockReturnValue(createMockQuery(user));
       mockCtx.db.insert.mockResolvedValue('action-123');
 

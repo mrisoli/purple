@@ -3,8 +3,8 @@ import { SignUpButton } from '@clerk/nextjs';
 import { Authenticated, Unauthenticated } from 'convex/react';
 import { ArrowRight, Check, X } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { StripeCheckout } from '@/components/stripe-checkout';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,7 +13,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-const renderButton = (buttonText: string, recommended: boolean, planName: string) => {
+const renderButton = (
+  buttonText: string,
+  recommended: boolean,
+  planName: string
+) => {
   if (buttonText === 'Get Started Free') {
     return (
       <SignUpButton mode="modal">
@@ -23,34 +27,31 @@ const renderButton = (buttonText: string, recommended: boolean, planName: string
       </SignUpButton>
     );
   }
-  
+
   if (planName === 'Premium') {
     return (
       <StripeCheckout
-        priceId={process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'}
         buttonText={buttonText}
-        variant={recommended ? 'default' : 'outline'}
-        size="lg"
         className="w-full"
+        priceId={
+          process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'
+        }
+        size="lg"
+        variant={recommended ? 'default' : 'outline'}
       />
     );
   }
-  
+
   if (buttonText === 'Contact Sales') {
     return (
-      <Button 
-        asChild 
-        className="w-full" 
-        size="lg" 
-        variant="outline"
-      >
+      <Button asChild className="w-full" size="lg" variant="outline">
         <Link href="mailto:sales@purple.app?subject=Team Plan Inquiry">
           {buttonText}
         </Link>
       </Button>
     );
   }
-  
+
   return (
     <Button className="w-full" size="lg" variant="outline">
       {buttonText}

@@ -1,15 +1,21 @@
 'use client';
 
-import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 interface StripeCheckoutProps {
   priceId: string;
   buttonText?: string;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
 }
@@ -33,7 +39,9 @@ export function StripeCheckout({
 
     try {
       // Load Stripe
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      );
 
       if (!stripe) {
         throw new Error('Failed to load Stripe');
@@ -79,11 +87,11 @@ export function StripeCheckout({
 
   return (
     <Button
-      onClick={handleCheckout}
-      disabled={isLoading}
-      variant={variant}
-      size={size}
       className={className}
+      disabled={isLoading}
+      onClick={handleCheckout}
+      size={size}
+      variant={variant}
     >
       {isLoading ? (
         <>

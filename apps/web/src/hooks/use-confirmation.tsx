@@ -83,13 +83,11 @@ export function useConfirmation() {
 
   const ConfirmationDialog = useCallback(() => {
     return (
-      <AlertDialog open={state.isOpen} onOpenChange={() => state.onCancel?.()}>
+      <AlertDialog onOpenChange={() => state.onCancel?.()} open={state.isOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{state.title}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {state.description}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{state.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={state.onCancel}>

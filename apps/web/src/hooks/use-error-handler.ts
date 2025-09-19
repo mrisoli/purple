@@ -21,9 +21,10 @@ export function useErrorHandler() {
       } = options;
 
       // Normalize error to Error object
-      const normalizedError = error instanceof Error 
-        ? error 
-        : new Error(typeof error === 'string' ? error : 'Unknown error');
+      const normalizedError =
+        error instanceof Error
+          ? error
+          : new Error(typeof error === 'string' ? error : 'Unknown error');
 
       // Log error for debugging
       if (logError) {
@@ -33,7 +34,7 @@ export function useErrorHandler() {
       // Show toast notification
       if (showToast) {
         const message = normalizedError.message || fallbackMessage;
-        
+
         if (toastTitle) {
           toast.error(toastTitle, {
             description: message,

@@ -1,10 +1,14 @@
 import { Resend } from 'resend';
 
 if (!process.env.RESEND_API_KEY) {
-  console.warn('RESEND_API_KEY is not set. Email functionality will be disabled.');
+  console.warn(
+    'RESEND_API_KEY is not set. Email functionality will be disabled.'
+  );
 }
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 interface BuddyInvitationEmailData {
   buddyEmail: string;
@@ -22,10 +26,17 @@ export async function sendBuddyInvitationEmail(data: BuddyInvitationEmailData) {
   }
 
   try {
-    const { buddyEmail, buddyName, inviterName, projectName, projectDescription, inviteLink } = data;
+    const {
+      buddyEmail,
+      buddyName,
+      inviterName,
+      projectName,
+      projectDescription,
+      inviteLink,
+    } = data;
 
     const subject = `${inviterName} invited you to be their accountability buddy`;
-    
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -115,9 +126,9 @@ export async function sendBuddyInvitationEmail(data: BuddyInvitationEmailData) {
     return { success: true, data: result };
   } catch (error) {
     console.error('Error sending buddy invitation email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send email' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send email',
     };
   }
 }
@@ -136,8 +147,9 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
   try {
     const { userEmail, userName } = data;
 
-    const subject = `Welcome to Purple - Your Accountability Journey Starts Now! 🎯`;
-    
+    const subject =
+      'Welcome to Purple - Your Accountability Journey Starts Now! 🎯';
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -204,9 +216,9 @@ export async function sendWelcomeEmail(data: WelcomeEmailData) {
     return { success: true, data: result };
   } catch (error) {
     console.error('Error sending welcome email:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to send email' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to send email',
     };
   }
 }

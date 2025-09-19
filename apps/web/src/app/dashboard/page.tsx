@@ -370,8 +370,11 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="flex gap-4">
                 <StripeCheckout
-                  priceId={process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'}
                   buttonText="Upgrade Now - $9/month"
+                  priceId={
+                    process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ||
+                    'price_premium'
+                  }
                 />
                 <Button asChild variant="outline">
                   <Link href="/pricing">View All Plans</Link>

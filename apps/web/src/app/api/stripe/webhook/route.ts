@@ -1,6 +1,6 @@
 import { api } from '@purple/backend/convex/_generated/api';
 import { ConvexHttpClient } from 'convex/browser';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -62,7 +62,9 @@ export async function POST(request: NextRequest) {
           sessionId: session.id,
         });
 
-        console.log(`User ${userId} upgraded to premium via session ${session.id}`);
+        console.log(
+          `User ${userId} upgraded to premium via session ${session.id}`
+        );
         break;
       }
 
