@@ -40,7 +40,7 @@ export function FormField({
         aria-describedby={(() => {
           if (error) return `${id}-error`;
           if (description) return `${id}-description`;
-          return undefined;
+          return;
         })()}
         aria-invalid={hasError}
         className={cn(hasError && 'border-red-500 focus-visible:ring-red-500')}

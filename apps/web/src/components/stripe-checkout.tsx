@@ -60,7 +60,9 @@ export function StripeCheckout({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create checkout session');
+        throw new Error(
+          errorData.message || 'Failed to create checkout session'
+        );
       }
 
       const { sessionId } = await response.json();

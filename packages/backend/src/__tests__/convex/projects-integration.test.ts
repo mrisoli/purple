@@ -1,51 +1,51 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Type definitions for test mocks
-interface MockIdentity {
+type MockIdentity = {
   subject: string;
   email?: string;
-}
+};
 
-interface MockUser {
+type MockUser = {
   _id: string;
   clerkId: string;
   email: string;
   name: string;
   premium: boolean;
   createdAt: number;
-}
+};
 
-interface MockProject {
+type MockProject = {
   _id: string;
   ownerId: string;
   name: string;
   description: string;
   buddyId?: string;
   createdAt: number;
-}
+};
 
-interface MockQuery {
+type MockQuery = {
   withIndex: ReturnType<typeof vi.fn>;
   filter: ReturnType<typeof vi.fn>;
   unique: ReturnType<typeof vi.fn>;
   collect: ReturnType<typeof vi.fn>;
   eq: ReturnType<typeof vi.fn>;
   field: ReturnType<typeof vi.fn>;
-}
+};
 
-interface MockDatabase {
+type MockDatabase = {
   query: ReturnType<typeof vi.fn>;
   insert: ReturnType<typeof vi.fn>;
   get: ReturnType<typeof vi.fn>;
   patch: ReturnType<typeof vi.fn>;
-}
+};
 
-interface MockContext {
+type MockContext = {
   auth: {
     getUserIdentity: ReturnType<typeof vi.fn>;
   };
   db: MockDatabase;
-}
+};
 
 // Mock Convex environment
 const createMockContext = (
@@ -110,15 +110,15 @@ const checkProjectLimit = async (ctx: MockContext, user: MockUser) => {
   }
 };
 
-interface CreateProjectArgs {
+type CreateProjectArgs = {
   name: string;
   description: string;
-}
+};
 
-interface InviteBuddyArgs {
+type InviteBuddyArgs = {
   projectId: string;
   buddyEmail: string;
-}
+};
 
 const createProjectMutation = async (
   ctx: MockContext,
@@ -165,9 +165,9 @@ const inviteBuddyMutation = async (ctx: MockContext, args: InviteBuddyArgs) => {
   return { success: true };
 };
 
-interface GetProjectArgs {
+type GetProjectArgs = {
   projectId: string;
-}
+};
 
 const getProjectQuery = async (ctx: MockContext, args: GetProjectArgs) => {
   const identity = await ctx.auth.getUserIdentity();
