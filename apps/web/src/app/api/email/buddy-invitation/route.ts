@@ -4,10 +4,19 @@ import { ConvexHttpClient } from 'convex/browser';
 import { type NextRequest, NextResponse } from 'next/server';
 import { sendBuddyInvitationEmail } from '@/lib/email';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const convex = process.env.NEXT_PUBLIC_CONVEX_URL
+  ? new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL)
+  : null;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!convex) {
+      return NextResponse.json(
+        { error: 'Convex is not configured' },
+        { status: 500 }
+      );
+    }
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,14 +32,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get JWT token for authenticated Convex requests
+    const { getToken } = await auth();
+    const jwtToken = await getToken({ template: 'convex' });
+
+    if (!jwtToken) {
+      return NextResponse.json(
+        { error: 'Unable to get auth token' },
+        { status: 401 }
+      );
+    }
+
+    // Set auth for convex client
+    convex.setAuth(jwtToken);
+
     // Get project details and user info from Convex
     const [project, currentUser] = await Promise.all([
       convex.query(api.projects.get, { projectId }),
-      convex.query(
-        api.users.current,
-        {},
-        { jwt: await fetch('/api/convex-jwt').then((r) => r.text()) }
-      ),
+      convex.query(api.users.current, {}),
     ]);
 
     if (!(project && currentUser)) {
