@@ -66,3 +66,48 @@ export const upgradeToPremium = mutation({
     return { success: true };
   },
 });
+
+export const downgradeFromPremium = mutation({
+  args: {
+    userId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, { premium: false });
+    return { success: true };
+  },
+});
+
+export const updateStripeCustomerId = mutation({
+  args: {
+    userId: v.id('users'),
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, { stripeCustomerId: args.stripeCustomerId });
+    return { success: true };
+  },
+});
+
+export const findByClerkId = query({
+  args: {
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .withIndex('by_clerkId', (q) => q.eq('clerkId', args.clerkId))
+      .unique();
+  },
+});
+
+export const findByStripeCustomerId = query({
+  args: {
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('stripeCustomerId'), args.stripeCustomerId))
+      .unique();
+  },
+});

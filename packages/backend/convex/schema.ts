@@ -7,8 +7,11 @@ export default defineSchema({
     email: v.string(),
     name: v.string(),
     premium: v.boolean(),
+    stripeCustomerId: v.optional(v.string()),
     createdAt: v.number(),
-  }).index('by_clerkId', ['clerkId']),
+  })
+    .index('by_clerkId', ['clerkId'])
+    .index('by_stripeCustomerId', ['stripeCustomerId']),
 
   projects: defineTable({
     ownerId: v.id('users'),

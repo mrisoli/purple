@@ -4,6 +4,7 @@ import { Authenticated, Unauthenticated } from 'convex/react';
 import { ArrowRight, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { StripeCheckout } from '@/components/stripe-checkout';
 import {
   Card,
   CardContent,
@@ -12,20 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-const renderButton = (buttonText: string, recommended: boolean) => {
-  if (buttonText === 'Start Free Trial') {
-    return (
-      <SignUpButton mode="modal">
-        <Button
-          className="w-full"
-          size="lg"
-          variant={recommended ? 'default' : 'outline'}
-        >
-          {buttonText}
-        </Button>
-      </SignUpButton>
-    );
-  }
+const renderButton = (buttonText: string, recommended: boolean, planName: string) => {
   if (buttonText === 'Get Started Free') {
     return (
       <SignUpButton mode="modal">
@@ -35,6 +23,34 @@ const renderButton = (buttonText: string, recommended: boolean) => {
       </SignUpButton>
     );
   }
+  
+  if (planName === 'Premium') {
+    return (
+      <StripeCheckout
+        priceId={process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'}
+        buttonText={buttonText}
+        variant={recommended ? 'default' : 'outline'}
+        size="lg"
+        className="w-full"
+      />
+    );
+  }
+  
+  if (buttonText === 'Contact Sales') {
+    return (
+      <Button 
+        asChild 
+        className="w-full" 
+        size="lg" 
+        variant="outline"
+      >
+        <Link href="mailto:sales@purple.app?subject=Team Plan Inquiry">
+          {buttonText}
+        </Link>
+      </Button>
+    );
+  }
+  
   return (
     <Button className="w-full" size="lg" variant="outline">
       {buttonText}
@@ -203,7 +219,7 @@ export default function PricingPage() {
                   </Button>
                 </Authenticated>
                 <Unauthenticated>
-                  {renderButton(buttonText, recommended)}
+                  {renderButton(buttonText, recommended, name)}
                 </Unauthenticated>
 
                 <div className="space-y-4">

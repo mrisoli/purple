@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/empty-state';
+import { StripeCheckout } from '@/components/stripe-checkout';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -367,9 +368,13 @@ export default function Dashboard() {
                   unlimited projects and get more features.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Button asChild>
-                  <Link href="/pricing">Upgrade to Premium</Link>
+              <CardContent className="flex gap-4">
+                <StripeCheckout
+                  priceId={process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'}
+                  buttonText="Upgrade Now - $9/month"
+                />
+                <Button asChild variant="outline">
+                  <Link href="/pricing">View All Plans</Link>
                 </Button>
               </CardContent>
             </Card>
