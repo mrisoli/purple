@@ -25,7 +25,7 @@ export default function AboutPage() {
       icon: Target,
       title: 'Goal-Focused',
       description:
-        "We believe everyone has the potential to achieve their dreams with the right support and accountability.",
+        'We believe everyone has the potential to achieve their dreams with the right support and accountability.',
     },
     {
       icon: Users,
@@ -63,12 +63,14 @@ export default function AboutPage() {
     {
       name: 'David Rodriguez',
       role: 'Head of Design',
-      background: 'UX designer focused on motivational and behavior-change applications',
+      background:
+        'UX designer focused on motivational and behavior-change applications',
     },
     {
       name: 'Emma Williams',
       role: 'Community Manager',
-      background: 'Psychology background with expertise in peer support and accountability systems',
+      background:
+        'Psychology background with expertise in peer support and accountability systems',
     },
   ] as const;
 
@@ -105,29 +107,32 @@ export default function AboutPage() {
             <h2 className="font-bold text-3xl">Our Story</h2>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                Our platform was founded in 2022 when our team experienced firsthand
-                the challenge of staying accountable to personal goals. We realized
-                that having the right accountability partner could make all the difference
-                between giving up and achieving success.
+                Our platform was founded in 2022 when our team experienced
+                firsthand the challenge of staying accountable to personal
+                goals. We realized that having the right accountability partner
+                could make all the difference between giving up and achieving
+                success.
               </p>
               <p>
-                Starting with a simple idea—what if accountability was as easy as
-                finding a workout buddy?—we set out to build something different. 
-                We wanted to create a platform that would connect people with shared
-                goals and provide the tools they need to support each other.
+                Starting with a simple idea—what if accountability was as easy
+                as finding a workout buddy?—we set out to build something
+                different. We wanted to create a platform that would connect
+                people with shared goals and provide the tools they need to
+                support each other.
               </p>
               <p>
-                Today, thousands of goal-oriented individuals around the world use
-                our platform to find accountability partners, track their progress,
-                and achieve their most important goals. We're just getting started.
+                Today, thousands of goal-oriented individuals around the world
+                use our platform to find accountability partners, track their
+                progress, and achieve their most important goals. We're just
+                getting started.
               </p>
             </div>
           </div>
           <div className="space-y-4 rounded-lg bg-muted/30 p-8 text-center">
             <h3 className="font-semibold text-2xl">Founded in 2022</h3>
             <p className="text-muted-foreground">
-              Born from the belief that accountability partnerships can transform
-              lives and help people achieve their biggest dreams.
+              Born from the belief that accountability partnerships can
+              transform lives and help people achieve their biggest dreams.
             </p>
             <div className="flex justify-center gap-4 pt-4">
               <div className="text-center">
@@ -201,15 +206,17 @@ export default function AboutPage() {
         <div className="mx-auto max-w-4xl space-y-6">
           <h2 className="font-bold text-3xl">Our Mission</h2>
           <blockquote className="text-muted-foreground text-xl italic">
-            "To empower individuals worldwide with meaningful accountability partnerships
-            that unlock their potential and help them achieve their most important goals
-            through consistent support and shared commitment."
+            "To empower individuals worldwide with meaningful accountability
+            partnerships that unlock their potential and help them achieve their
+            most important goals through consistent support and shared
+            commitment."
           </blockquote>
           <div className="pt-6">
             <p className="text-muted-foreground">
-              We believe that when people have the right accountability partner, they can
-              accomplish extraordinary things. That's why we're committed to building
-              the best platform for creating lasting accountability relationships.
+              We believe that when people have the right accountability partner,
+              they can accomplish extraordinary things. That's why we're
+              committed to building the best platform for creating lasting
+              accountability relationships.
             </p>
           </div>
         </div>
@@ -217,10 +224,13 @@ export default function AboutPage() {
 
       {/* CTA Section */}
       <section className="space-y-6 py-16 text-center">
-        <h2 className="font-bold text-3xl">Start Your Accountability Journey</h2>
+        <h2 className="font-bold text-3xl">
+          Start Your Accountability Journey
+        </h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
-          Ready to achieve your goals with the power of accountability? Join thousands of
-          goal achievers who have transformed their lives with the right support.
+          Ready to achieve your goals with the power of accountability? Join
+          thousands of goal achievers who have transformed their lives with the
+          right support.
         </p>
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <Authenticated>

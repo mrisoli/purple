@@ -37,9 +37,7 @@ export default function RootLayout({
             <SkipLink />
             <div className="grid h-svh grid-rows-[auto_1fr]">
               <Header />
-              <main id="main-content">
-                {children}
-              </main>
+              <main id="main-content">{children}</main>
             </div>
           </Providers>
         </ClerkProvider>

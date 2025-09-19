@@ -20,6 +20,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { EmptyState } from '@/components/empty-state';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -28,7 +29,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { EmptyState } from '@/components/empty-state';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -244,13 +244,13 @@ export default function Dashboard() {
                   ))}
                 {projects !== undefined && projects.length === 0 && (
                   <EmptyState
-                    icon={Target}
-                    title="No projects yet"
-                    description="Create your first project to start your accountability journey!"
                     action={{
                       label: 'Create Your First Project',
                       onClick: () => setShowCreateForm(true),
                     }}
+                    description="Create your first project to start your accountability journey!"
+                    icon={Target}
+                    title="No projects yet"
                   />
                 )}
                 {projects !== undefined &&
@@ -319,9 +319,9 @@ export default function Dashboard() {
                   ))}
                 {recentActions !== undefined && recentActions.length === 0 && (
                   <EmptyState
+                    description="Start logging progress updates to see your activity timeline!"
                     icon={Activity}
                     title="No activity yet"
-                    description="Start logging progress updates to see your activity timeline!"
                   />
                 )}
                 {recentActions !== undefined &&

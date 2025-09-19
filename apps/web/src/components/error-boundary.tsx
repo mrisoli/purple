@@ -1,7 +1,7 @@
 'use client';
 
-import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -45,11 +45,14 @@ export class ErrorBoundary extends Component<Props, State> {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                 <AlertTriangle className="h-8 w-8 text-red-600" />
               </div>
-              <CardTitle className="text-red-900">Something went wrong</CardTitle>
+              <CardTitle className="text-red-900">
+                Something went wrong
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-center">
               <p className="text-red-700 text-sm">
-                We encountered an unexpected error. This has been logged and our team will investigate.
+                We encountered an unexpected error. This has been logged and our
+                team will investigate.
               </p>
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <details className="text-left">

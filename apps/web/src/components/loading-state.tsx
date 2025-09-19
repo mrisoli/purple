@@ -7,10 +7,10 @@ interface LoadingStateProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function LoadingState({ 
-  message = 'Loading...', 
+export function LoadingState({
+  message = 'Loading...',
   className,
-  size = 'md' 
+  size = 'md',
 }: LoadingStateProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',
@@ -19,11 +19,16 @@ export function LoadingState({
   };
 
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-2 py-8', className)}>
-      <Loader2 className={cn('animate-spin text-muted-foreground', sizeClasses[size])} />
-      {message && (
-        <p className="text-muted-foreground text-sm">{message}</p>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-2 py-8',
+        className
       )}
+    >
+      <Loader2
+        className={cn('animate-spin text-muted-foreground', sizeClasses[size])}
+      />
+      {message && <p className="text-muted-foreground text-sm">{message}</p>}
     </div>
   );
 }
@@ -37,11 +42,5 @@ export function PageLoadingState() {
 }
 
 export function InlineLoadingState({ message }: { message?: string }) {
-  return (
-    <LoadingState 
-      message={message} 
-      size="sm" 
-      className="py-4" 
-    />
-  );
+  return <LoadingState className="py-4" message={message} size="sm" />;
 }

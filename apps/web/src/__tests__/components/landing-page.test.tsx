@@ -6,17 +6,20 @@ describe('Landing Page Component', () => {
       {
         icon: 'Users',
         title: 'Find Your Buddy',
-        description: 'Connect with accountability partners who will keep you motivated and on track',
+        description:
+          'Connect with accountability partners who will keep you motivated and on track',
       },
       {
         icon: 'CheckCircle',
         title: 'Track Progress',
-        description: 'Log updates, celebrate milestones, and see your growth over time',
+        description:
+          'Log updates, celebrate milestones, and see your growth over time',
       },
       {
         icon: 'Zap',
         title: 'Stay Motivated',
-        description: 'Real-time notifications and friendly nudges from your accountability buddy',
+        description:
+          'Real-time notifications and friendly nudges from your accountability buddy',
       },
     ];
 
@@ -24,8 +27,8 @@ describe('Landing Page Component', () => {
     expect(features[0].title).toBe('Find Your Buddy');
     expect(features[1].title).toBe('Track Progress');
     expect(features[2].title).toBe('Stay Motivated');
-    
-    features.forEach(feature => {
+
+    features.forEach((feature) => {
       expect(feature.title.length).toBeGreaterThan(0);
       expect(feature.description.length).toBeGreaterThan(0);
       expect(feature.icon.length).toBeGreaterThan(0);
@@ -43,7 +46,7 @@ describe('Landing Page Component', () => {
     ];
 
     expect(benefits).toHaveLength(6);
-    benefits.forEach(benefit => {
+    benefits.forEach((benefit) => {
       expect(benefit.length).toBeGreaterThan(0);
       expect(typeof benefit).toBe('string');
     });
@@ -61,7 +64,8 @@ describe('Landing Page Component', () => {
 
   it('should have proper marketing copy', () => {
     const heroTitle = 'Achieve Your Goals with Accountability Buddies';
-    const heroDescription = 'Transform your ambitions into achievements. Connect with accountability partners who will support, motivate, and celebrate your progress every step of the way.';
+    const heroDescription =
+      'Transform your ambitions into achievements. Connect with accountability partners who will support, motivate, and celebrate your progress every step of the way.';
 
     expect(heroTitle.includes('Goals')).toBe(true);
     expect(heroTitle.includes('Accountability')).toBe(true);

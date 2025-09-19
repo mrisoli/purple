@@ -13,12 +13,12 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ 
-  icon: Icon, 
-  title, 
-  description, 
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
   action,
-  className 
+  className,
 }: EmptyStateProps) {
   return (
     <Card className={className}>
@@ -26,11 +26,7 @@ export function EmptyState({
         <Icon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <h3 className="mb-2 font-medium text-lg">{title}</h3>
         <p className="mb-4 text-muted-foreground">{description}</p>
-        {action && (
-          <Button onClick={action.onClick}>
-            {action.label}
-          </Button>
-        )}
+        {action && <Button onClick={action.onClick}>{action.label}</Button>}
       </CardContent>
     </Card>
   );

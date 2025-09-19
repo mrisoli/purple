@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -63,17 +63,13 @@ export function ConfirmationDialog({
           </div>
         </CardHeader>
         <CardFooter className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
+          <Button disabled={isLoading} onClick={onCancel} variant="outline">
             {cancelLabel}
           </Button>
           <Button
-            variant={variant === 'destructive' ? 'destructive' : 'default'}
-            onClick={handleConfirm}
             disabled={isLoading}
+            onClick={handleConfirm}
+            variant={variant === 'destructive' ? 'destructive' : 'default'}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {confirmLabel}
