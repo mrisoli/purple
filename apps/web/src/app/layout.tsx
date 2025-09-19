@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '../index.css';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Analytics } from '@vercel/analytics/react';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
 import { SkipLink } from '@/components/skip-link';
@@ -41,6 +42,7 @@ export default function RootLayout({
             </div>
           </Providers>
         </ClerkProvider>
+        <Analytics />
       </body>
     </html>
   );
