@@ -6,12 +6,12 @@ describe('Actions Business Logic', () => {
       'progress_update',
       'milestone_reached',
       'challenge_faced',
-      'help_needed'
+      'help_needed',
     ];
 
     const testAction = {
       type: 'progress_update',
-      message: 'Completed today\'s Spanish lesson',
+      message: "Completed today's Spanish lesson",
     };
 
     expect(validActionTypes.includes(testAction.type)).toBe(true);
@@ -31,23 +31,25 @@ describe('Actions Business Logic', () => {
 
     // Owner should be able to create actions
     expect(project.ownerId === owner._id).toBe(true);
-    
+
     // Buddy should be able to create actions
     expect(project.buddyId === buddy._id).toBe(true);
-    
+
     // Stranger should not be able to create actions
-    expect(project.ownerId === stranger._id || project.buddyId === stranger._id).toBe(false);
+    expect(
+      project.ownerId === stranger._id || project.buddyId === stranger._id
+    ).toBe(false);
   });
 
   it('should handle action message validation', () => {
     const validAction = {
       message: 'Made significant progress on my goal today',
-      type: 'progress_update'
+      type: 'progress_update',
     };
 
     const invalidAction = {
       message: '',
-      type: 'progress_update'
+      type: 'progress_update',
     };
 
     expect(validAction.message.trim().length > 0).toBe(true);
@@ -58,7 +60,7 @@ describe('Actions Business Logic', () => {
     const actions = [
       { _id: '1', createdAt: 1000, message: 'First' },
       { _id: '2', createdAt: 3000, message: 'Third' },
-      { _id: '3', createdAt: 2000, message: 'Second' }
+      { _id: '3', createdAt: 2000, message: 'Second' },
     ];
 
     const sortedActions = actions.sort((a, b) => b.createdAt - a.createdAt);
@@ -76,11 +78,13 @@ describe('Actions Business Logic', () => {
       { projectId: 'project-3', message: 'Action 3' }, // User has no access
     ];
 
-    const userActions = allActions.filter(action => 
+    const userActions = allActions.filter((action) =>
       userProjects.includes(action.projectId)
     );
 
     expect(userActions.length).toBe(2);
-    expect(userActions.every(action => userProjects.includes(action.projectId))).toBe(true);
+    expect(
+      userActions.every((action) => userProjects.includes(action.projectId))
+    ).toBe(true);
   });
 });
