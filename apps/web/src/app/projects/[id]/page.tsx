@@ -69,13 +69,39 @@ export default function ProjectPage() {
     }
 
     try {
+      // First, invite the buddy in the database
       await inviteBuddy({
         projectId,
         buddyEmail: buddyEmail.trim(),
       });
+
+      // Then send the invitation email
+      const emailResponse = await fetch('/api/email/buddy-invitation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectId,
+          buddyEmail: buddyEmail.trim(),
+        }),
+      });
+
+      const emailResult = await emailResponse.json();
+
       setBuddyEmail('');
       setShowInviteForm(false);
-      toast.success('Buddy invited successfully!');
+
+      if (emailResult.success) {
+        toast.success(
+          emailResult.hasAccount
+            ? 'Buddy invited successfully! They\'ll receive an email notification.'
+            : 'Invitation sent! They\'ll receive an email with instructions to join.'
+        );
+      } else {
+        toast.success('Buddy invited successfully! (Email notification failed to send)');
+        console.warn('Email send failed:', emailResult.error);
+      }
     } catch (error) {
       toast.error(
         error instanceof Error
