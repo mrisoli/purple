@@ -42,11 +42,11 @@ export function useConfirmation() {
           ...options,
           isOpen: true,
           onConfirm: () => {
-            setState((prev) => ({ ...prev, isOpen: false }));
+            setState((current) => ({ ...current, isOpen: false }));
             resolve(true);
           },
           onCancel: () => {
-            setState((prev) => ({ ...prev, isOpen: false }));
+            setState((current) => ({ ...current, isOpen: false }));
             resolve(false);
           },
         }));

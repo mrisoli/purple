@@ -69,6 +69,334 @@ type DashboardContentProps = {
   setProjectDescription: (desc: string) => void;
 };
 
+// Helper components to reduce complexity
+function DashboardHeader({
+  user,
+  currentUser,
+}: {
+  user: DashboardContentProps['user'];
+  currentUser: User | null | undefined;
+}) {
+  return (
+    <div className="mb-8 flex items-center justify-between">
+      <div>
+        <h1 className="font-bold text-3xl">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back, {user?.fullName || user?.firstName}!
+          {currentUser?.premium ? ' (Premium)' : ' (Free)'}
+        </p>
+      </div>
+      <UserButton />
+    </div>
+  );
+}
+
+function StatsCards({
+  stats,
+  currentUser,
+}: {
+  stats: {
+    totalProjects: number;
+    activeProjects: number;
+    withBuddies: number;
+    recentActionsCount: number;
+  };
+  currentUser: User | null | undefined;
+}) {
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="font-medium text-sm">Total Projects</CardTitle>
+          <Target className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="font-bold text-2xl">{stats.totalProjects}</div>
+          <p className="text-muted-foreground text-xs">
+            {currentUser?.premium ? 'Unlimited' : '1 max for free users'}
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="font-medium text-sm">With Buddies</CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="font-bold text-2xl">{stats.withBuddies}</div>
+          <p className="text-muted-foreground text-xs">
+            Projects with accountability partners
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="font-medium text-sm">Need Buddies</CardTitle>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="font-bold text-2xl">{stats.activeProjects}</div>
+          <p className="text-muted-foreground text-xs">
+            Waiting for accountability partners
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="font-medium text-sm">Recent Actions</CardTitle>
+          <Activity className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="font-bold text-2xl">{stats.recentActionsCount}</div>
+          <p className="text-muted-foreground text-xs">
+            Latest progress updates
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ProjectsSection({
+  projects,
+  showCreateForm,
+  setShowCreateForm,
+  onCreateProject,
+  projectName,
+  setProjectName,
+  projectDescription,
+  setProjectDescription,
+}: {
+  projects: Project[] | undefined;
+  showCreateForm: boolean;
+  setShowCreateForm: (show: boolean) => void;
+  onCreateProject: (e: React.FormEvent) => Promise<void>;
+  projectName: string;
+  setProjectName: (name: string) => void;
+  projectDescription: string;
+  setProjectDescription: (desc: string) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="font-semibold text-xl">Your Projects</h2>
+        <Button
+          onClick={() => setShowCreateForm(!showCreateForm)}
+          size="sm"
+          variant="outline"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          New Project
+        </Button>
+      </div>
+
+      {showCreateForm && (
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-lg">Create New Project</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={onCreateProject}>
+              <div>
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input
+                  id="projectName"
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="e.g., Learn Spanish, Build a side project..."
+                  required
+                  value={projectName}
+                />
+              </div>
+              <div>
+                <Label htmlFor="projectDescription">Description</Label>
+                <Input
+                  id="projectDescription"
+                  onChange={(e) => setProjectDescription(e.target.value)}
+                  placeholder="What are you trying to achieve?"
+                  value={projectDescription}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" type="submit">
+                  Create Project
+                </Button>
+                <Button
+                  onClick={() => setShowCreateForm(false)}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="space-y-4">
+        {projects === undefined &&
+          Array.from({ length: 2 }, (_, i) => (
+            <Card key={`loading-skeleton-${i + 1}`}>
+              <CardHeader>
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardHeader>
+            </Card>
+          ))}
+        {projects !== undefined && projects.length === 0 && (
+          <EmptyState
+            action={{
+              label: 'Create Your First Project',
+              onClick: () => setShowCreateForm(true),
+            }}
+            description="Create your first project to start your accountability journey!"
+            icon={Target}
+            title="No projects yet"
+          />
+        )}
+        {projects !== undefined &&
+          projects.length > 0 &&
+          projects.map((project) => (
+            <Card
+              className="transition-shadow hover:shadow-md"
+              key={project._id}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{project.name}</CardTitle>
+                    <CardDescription>{project.description}</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {project.buddyId ? (
+                      <div className="flex items-center text-green-600">
+                        <Users className="mr-1 h-4 w-4" />
+                        <span className="text-sm">Has Buddy</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-amber-600">
+                        <Clock className="mr-1 h-4 w-4" />
+                        <span className="text-sm">Needs Buddy</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <p className="text-muted-foreground text-sm">
+                    Created {new Date(project.createdAt).toLocaleDateString()}
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href={`/projects/${project._id}`}>View Project</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+function RecentActivitySection({
+  recentActions,
+}: {
+  recentActions: ActionType[] | undefined;
+}) {
+  return (
+    <div>
+      <h2 className="mb-4 font-semibold text-xl">Recent Activity</h2>
+      <div className="space-y-4">
+        {recentActions === undefined &&
+          Array.from({ length: 3 }, (_, i) => (
+            <Card key={`activity-skeleton-${i + 1}`}>
+              <CardContent className="py-4">
+                <Skeleton className="mb-2 h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
+        {recentActions !== undefined && recentActions.length === 0 && (
+          <EmptyState
+            description="Start logging progress updates to see your activity timeline!"
+            icon={Activity}
+            title="No activity yet"
+          />
+        )}
+        {recentActions !== undefined &&
+          recentActions.length > 0 &&
+          recentActions.map((action) => (
+            <Card key={action._id}>
+              <CardContent className="py-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    {action.type === 'milestone_reached' ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Activity className="h-4 w-4 text-blue-600" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">
+                      {action.user?.name || 'Someone'} in "
+                      {action.project?.name}"
+                    </p>
+                    <p className="text-muted-foreground text-sm">
+                      {action.message}
+                    </p>
+                    <p className="mt-1 text-muted-foreground text-xs">
+                      {new Date(action.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+function UpgradePrompt({
+  currentUser,
+  stats,
+}: {
+  currentUser: User | null | undefined;
+  stats: { totalProjects: number };
+}) {
+  if (currentUser?.premium || stats.totalProjects < 1) {
+    return null;
+  }
+
+  return (
+    <Card className="mt-8 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <CardHeader>
+        <CardTitle className="text-lg">Unlock More Projects</CardTitle>
+        <CardDescription>
+          You've used your free project! Upgrade to Premium to create unlimited
+          projects and get more features.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex gap-4">
+        <StripeCheckout
+          buttonText="Upgrade Now - $9/month"
+          priceId={
+            process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID || 'price_premium'
+          }
+        />
+        <Button asChild variant="outline">
+          <Link href="/pricing">View All Plans</Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 function DashboardContent({
   user,
   currentUser,
@@ -91,286 +419,24 @@ function DashboardContent({
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="font-bold text-3xl">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.fullName || user?.firstName}!
-            {currentUser?.premium ? ' (Premium)' : ' (Free)'}
-          </p>
-        </div>
-        <UserButton />
-      </div>
-
-      {/* Stats Cards */}
-      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">
-              Total Projects
-            </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="font-bold text-2xl">{stats.totalProjects}</div>
-            <p className="text-muted-foreground text-xs">
-              {currentUser?.premium ? 'Unlimited' : '1 max for free users'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">With Buddies</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="font-bold text-2xl">{stats.withBuddies}</div>
-            <p className="text-muted-foreground text-xs">
-              Projects with accountability partners
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">Need Buddies</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="font-bold text-2xl">{stats.activeProjects}</div>
-            <p className="text-muted-foreground text-xs">
-              Waiting for accountability partners
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">
-              Recent Actions
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="font-bold text-2xl">{stats.recentActionsCount}</div>
-            <p className="text-muted-foreground text-xs">
-              Latest progress updates
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardHeader currentUser={currentUser} user={user} />
+      <StatsCards currentUser={currentUser} stats={stats} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Projects Section */}
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold text-xl">Your Projects</h2>
-            <Button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              size="sm"
-              variant="outline"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              New Project
-            </Button>
-          </div>
-
-          {/* Create Project Form */}
-          {showCreateForm && (
-            <Card className="mb-4">
-              <CardHeader>
-                <CardTitle className="text-lg">Create New Project</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4" onSubmit={onCreateProject}>
-                  <div>
-                    <Label htmlFor="projectName">Project Name</Label>
-                    <Input
-                      id="projectName"
-                      onChange={(e) => setProjectName(e.target.value)}
-                      placeholder="e.g., Learn Spanish, Build a side project..."
-                      required
-                      value={projectName}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="projectDescription">Description</Label>
-                    <Input
-                      id="projectDescription"
-                      onChange={(e) => setProjectDescription(e.target.value)}
-                      placeholder="What are you trying to achieve?"
-                      value={projectDescription}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" type="submit">
-                      Create Project
-                    </Button>
-                    <Button
-                      onClick={() => setShowCreateForm(false)}
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Projects List */}
-          <div className="space-y-4">
-            {projects === undefined &&
-              // Loading skeletons
-              Array.from({ length: 2 }, (_, i) => (
-                <Card key={`loading-skeleton-${i + 1}`}>
-                  <CardHeader>
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </CardHeader>
-                </Card>
-              ))}
-            {projects !== undefined && projects.length === 0 && (
-              <EmptyState
-                action={{
-                  label: 'Create Your First Project',
-                  onClick: () => setShowCreateForm(true),
-                }}
-                description="Create your first project to start your accountability journey!"
-                icon={Target}
-                title="No projects yet"
-              />
-            )}
-            {projects !== undefined &&
-              projects.length > 0 &&
-              projects.map((project) => (
-                <Card
-                  className="transition-shadow hover:shadow-md"
-                  key={project._id}
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">
-                          {project.name}
-                        </CardTitle>
-                        <CardDescription>{project.description}</CardDescription>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {project.buddyId ? (
-                          <div className="flex items-center text-green-600">
-                            <Users className="mr-1 h-4 w-4" />
-                            <span className="text-sm">Has Buddy</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center text-amber-600">
-                            <Clock className="mr-1 h-4 w-4" />
-                            <span className="text-sm">Needs Buddy</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-sm">
-                        Created{' '}
-                        {new Date(project.createdAt).toLocaleDateString()}
-                      </p>
-                      <Button asChild size="sm">
-                        <Link href={`/projects/${project._id}`}>
-                          View Project
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div>
-          <h2 className="mb-4 font-semibold text-xl">Recent Activity</h2>
-          <div className="space-y-4">
-            {recentActions === undefined &&
-              // Loading skeletons
-              Array.from({ length: 3 }, (_, i) => (
-                <Card key={`activity-skeleton-${i + 1}`}>
-                  <CardContent className="py-4">
-                    <Skeleton className="mb-2 h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </CardContent>
-                </Card>
-              ))}
-            {recentActions !== undefined && recentActions.length === 0 && (
-              <EmptyState
-                description="Start logging progress updates to see your activity timeline!"
-                icon={Activity}
-                title="No activity yet"
-              />
-            )}
-            {recentActions !== undefined &&
-              recentActions.length > 0 &&
-              recentActions.map((action) => (
-                <Card key={action._id}>
-                  <CardContent className="py-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1">
-                        {action.type === 'milestone_reached' ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Activity className="h-4 w-4 text-blue-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">
-                          {action.user?.name || 'Someone'} in "
-                          {action.project?.name}"
-                        </p>
-                        <p className="text-muted-foreground text-sm">
-                          {action.message}
-                        </p>
-                        <p className="mt-1 text-muted-foreground text-xs">
-                          {new Date(action.createdAt).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-          </div>
-        </div>
+        <ProjectsSection
+          onCreateProject={onCreateProject}
+          projectDescription={projectDescription}
+          projectName={projectName}
+          projects={projects}
+          setProjectDescription={setProjectDescription}
+          setProjectName={setProjectName}
+          setShowCreateForm={setShowCreateForm}
+          showCreateForm={showCreateForm}
+        />
+        <RecentActivitySection recentActions={recentActions} />
       </div>
 
-      {/* Upgrade Prompt for Free Users */}
-      {!currentUser?.premium && stats.totalProjects >= 1 && (
-        <Card className="mt-8 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardHeader>
-            <CardTitle className="text-lg">Unlock More Projects</CardTitle>
-            <CardDescription>
-              You've used your free project! Upgrade to Premium to create
-              unlimited projects and get more features.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex gap-4">
-            <StripeCheckout
-              buttonText="Upgrade Now - $9/month"
-              priceId={
-                process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID ||
-                'price_premium'
-              }
-            />
-            <Button asChild variant="outline">
-              <Link href="/pricing">View All Plans</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+      <UpgradePrompt currentUser={currentUser} stats={stats} />
     </div>
   );
 }

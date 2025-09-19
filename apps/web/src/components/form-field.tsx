@@ -38,8 +38,12 @@ export function FormField({
       </Label>
       <Input
         aria-describedby={(() => {
-          if (error) return `${id}-error`;
-          if (description) return `${id}-description`;
+          if (error) {
+            return `${id}-error`;
+          }
+          if (description) {
+            return `${id}-description`;
+          }
           return;
         })()}
         aria-invalid={hasError}

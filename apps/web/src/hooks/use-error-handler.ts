@@ -28,6 +28,8 @@ export function useErrorHandler() {
 
       // Log error for debugging
       if (logError) {
+        // Use proper error logging in production - could be replaced with logging service
+        // eslint-disable-next-line no-console
         console.error('Error caught by error handler:', normalizedError);
       }
 
