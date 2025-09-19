@@ -27,6 +27,6 @@ while true; do
   git push
 
   # Wait a bit before restarting to avoid rapid restart loops
-  echo "Waiting 3 hours before restart..."
-  sleep 10800
+  echo "Waiting 1 hour before restart..."
+  sleep 3600
 done
