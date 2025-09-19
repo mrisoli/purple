@@ -37,9 +37,11 @@ export function FormField({
         {required && <span className="ml-1 text-red-500">*</span>}
       </Label>
       <Input
-        aria-describedby={
-          error ? `${id}-error` : description ? `${id}-description` : undefined
-        }
+        aria-describedby={(() => {
+          if (error) return `${id}-error`;
+          if (description) return `${id}-description`;
+          return undefined;
+        })()}
         aria-invalid={hasError}
         className={cn(hasError && 'border-red-500 focus-visible:ring-red-500')}
         id={id}

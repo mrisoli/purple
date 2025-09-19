@@ -15,15 +15,18 @@ type State = {
 };
 
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  state: State = {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {}
+  componentDidCatch(_error: Error, _errorInfo: ErrorInfo) {
+    // This method is called when an error is caught by the error boundary
+    // We don't need to do anything here as we handle the error in getDerivedStateFromError
+  }
 
   private readonly handleRetry = () => {
     this.setState({ hasError: false, error: undefined });
@@ -33,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
-  public render() {
+  render() {
     if (this.state.hasError) {
       return (
         <div className="container mx-auto max-w-md px-4 py-16">

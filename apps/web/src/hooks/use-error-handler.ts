@@ -28,6 +28,7 @@ export function useErrorHandler() {
 
       // Log error for debugging
       if (logError) {
+        console.error('Error caught by error handler:', normalizedError);
       }
 
       // Show toast notification

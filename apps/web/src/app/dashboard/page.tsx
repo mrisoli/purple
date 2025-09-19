@@ -55,8 +55,8 @@ type User = {
   premium: boolean;
 };
 
-interface DashboardContentProps {
-  user: any;
+type DashboardContentProps = {
+  user: ReturnType<typeof useUser>['user'];
   currentUser: User | null | undefined;
   projects: Project[] | undefined;
   recentActions: ActionType[] | undefined;
@@ -67,7 +67,7 @@ interface DashboardContentProps {
   setProjectName: (name: string) => void;
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
-}
+};
 
 function DashboardContent({
   user,
