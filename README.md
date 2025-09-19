@@ -1,6 +1,6 @@
-# Purple - Accountability Buddy Network
+# Purple - Accountability Buddy Network 🎯
 
-Transform your goals into achievements with accountability partners. Track progress, invite buddies, and stay motivated on your journey to success.
+Transform your goals into achievements with accountability partners. Purple connects you with buddies who will support, motivate, and celebrate your progress every step of the way.
 
 ## ✨ Features
 
@@ -23,6 +23,10 @@ Transform your goals into achievements with accountability partners. Track progr
 - **📱 Responsive Design**: Works perfectly on all devices
 - **🌙 Dark Mode**: Built-in theme switching
 - **♿ Accessibility**: ARIA-compliant and screen reader friendly
+- **💳 Payment Integration**: Stripe-powered premium subscriptions
+- **📧 Email Notifications**: Beautiful HTML emails via Resend
+- **🛡️ Error Handling**: Comprehensive error boundaries and user feedback
+- **⏳ Loading States**: Smooth UX with loading indicators
 
 ## 🚀 Getting Started
 
@@ -63,6 +67,22 @@ npx convex dev --configure
 - Add Convex URL to `apps/web/.env.local`:
 ```bash
 NEXT_PUBLIC_CONVEX_URL=https://your-convex-url.convex.cloud
+```
+
+6. **Optional: Configure Stripe (Premium Features)**
+```bash
+# Add to apps/web/.env.local
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID=price_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+7. **Optional: Configure Resend (Email Notifications)**
+```bash
+# Add to apps/web/.env.local
+RESEND_API_KEY=re_...
+NEXT_PUBLIC_APP_URL=http://localhost:3001
 ```
 
 5. **Configure Clerk + Convex Integration**
@@ -212,12 +232,24 @@ npm run check            # Format and lint with Biome
 
 ## 📋 Roadmap
 
-- [ ] **Premium Subscription Integration**: Stripe integration for Premium upgrades
-- [ ] **Mobile App**: React Native mobile application
-- [ ] **Email Notifications**: Buddy reminders and milestone celebrations
-- [ ] **Advanced Analytics**: Goal completion insights and trends
-- [ ] **Team Features**: Organizational dashboards and admin tools
-- [ ] **Integrations**: Calendar, Slack, and other productivity tools
+### ✅ Completed
+- **Premium Subscription Integration**: Stripe integration for Premium upgrades
+- **Email Notifications**: Buddy invitations and welcome emails
+- **Error Handling**: Comprehensive error boundaries and user feedback
+- **Testing Suite**: Unit and integration tests with Vitest
+
+### 🚧 In Progress
+- **Project Management**: Edit and delete functionality for projects
+- **User Profile**: Settings and profile management page
+
+### 📅 Planned
+- **Mobile App**: React Native mobile application
+- **Advanced Analytics**: Goal completion insights and trends
+- **Team Features**: Organizational dashboards and admin tools
+- **Push Notifications**: Real-time mobile and web notifications
+- **Goal Templates**: Pre-built goal categories and templates
+- **Social Features**: Public goals and community features
+- **Integrations**: Calendar, Slack, and other productivity tools
 
 ## 🛡️ Security
 
