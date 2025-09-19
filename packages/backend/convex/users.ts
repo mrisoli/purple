@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, internalQuery, mutation, query } from './_generated/server';
 
 export const current = query({
   handler: async (ctx) => {
@@ -111,5 +111,63 @@ export const findByStripeCustomerId = query({
       .query('users')
       .filter((q) => q.eq(q.field('stripeCustomerId'), args.stripeCustomerId))
       .unique();
+  },
+});
+
+// Internal functions for actions to call
+export const findByClerkIdInternal = internalQuery({
+  args: {
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .withIndex('by_clerkId', (q) => q.eq('clerkId', args.clerkId))
+      .unique();
+  },
+});
+
+export const findByStripeCustomerIdInternal = internalQuery({
+  args: {
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('stripeCustomerId'), args.stripeCustomerId))
+      .unique();
+  },
+});
+
+export const upgradeToPremiumInternal = internalMutation({
+  args: {
+    userId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, { premium: true });
+    return { success: true };
+  },
+});
+
+export const downgradeFromPremiumInternal = internalMutation({
+  args: {
+    userId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, { premium: false });
+    return { success: true };
+  },
+});
+
+export const updateStripeCustomerIdInternal = internalMutation({
+  args: {
+    userId: v.id('users'),
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, {
+      stripeCustomerId: args.stripeCustomerId,
+    });
+    return { success: true };
   },
 });

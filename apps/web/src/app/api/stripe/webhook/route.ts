@@ -88,10 +88,12 @@ export async function POST(request: NextRequest) {
         const customerId = invoice.customer as string;
 
         // Handle failed payment - could downgrade user after grace period
-        await convex.action(api.stripe.handleFailedPayment, {
-          stripeCustomerId: customerId,
-          invoiceId: invoice.id,
-        });
+        if (invoice.id) {
+          await convex.action(api.stripe.handleFailedPayment, {
+            stripeCustomerId: customerId,
+            invoiceId: invoice.id,
+          });
+        }
         break;
       }
 
