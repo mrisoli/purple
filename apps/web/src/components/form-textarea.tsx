@@ -1,37 +1,37 @@
 import { AlertCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { CHAR_COUNT_WARNING_THRESHOLD, cn } from '@/lib/utils';
 
-type FormFieldProps = {
+type FormTextareaProps = {
   label: string;
   id: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
-  type?: 'text' | 'email' | 'password';
   error?: string;
   description?: string;
   className?: string;
   maxLength?: number;
   showCharCount?: boolean;
+  rows?: number;
 };
 
-export function FormField({
+export function FormTextarea({
   label,
   id,
   value,
   onChange,
   placeholder,
   required = false,
-  type = 'text',
   error,
   description,
   className,
   maxLength,
   showCharCount = false,
-}: FormFieldProps) {
+  rows = 3,
+}: FormTextareaProps) {
   const hasError = Boolean(error);
 
   return (
@@ -40,7 +40,7 @@ export function FormField({
         {label}
         {required && <span className="ml-1 text-red-500">*</span>}
       </Label>
-      <Input
+      <Textarea
         aria-describedby={(() => {
           if (error) {
             return `${id}-error`;
@@ -57,7 +57,7 @@ export function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        type={type}
+        rows={rows}
         value={value}
       />
       {error && (

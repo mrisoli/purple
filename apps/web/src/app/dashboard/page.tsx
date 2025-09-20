@@ -18,9 +18,11 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/empty-state';
+import { FormField } from '@/components/form-field';
+import { FormTextarea } from '@/components/form-textarea';
 import { StripeCheckout } from '@/components/stripe-checkout';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,9 +32,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DEBOUNCE_DELAY, debounce, validation } from '@/lib/utils';
 
 type Project = {
   _id: string;
@@ -67,6 +68,7 @@ type DashboardContentProps = {
   setProjectName: (name: string) => void;
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
+  formErrors: { projectName?: string; projectDescription?: string };
 };
 
 // Helper components to reduce complexity
@@ -169,6 +171,7 @@ function ProjectsSection({
   setProjectName,
   projectDescription,
   setProjectDescription,
+  formErrors,
 }: {
   projects: Project[] | undefined;
   showCreateForm: boolean;
@@ -178,6 +181,7 @@ function ProjectsSection({
   setProjectName: (name: string) => void;
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
+  formErrors: { projectName?: string; projectDescription?: string };
 }) {
   return (
     <div>
@@ -200,25 +204,28 @@ function ProjectsSection({
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={onCreateProject}>
-              <div>
-                <Label htmlFor="projectName">Project Name</Label>
-                <Input
-                  id="projectName"
-                  onChange={(e) => setProjectName(e.target.value)}
-                  placeholder="e.g., Learn Spanish, Build a side project..."
-                  required
-                  value={projectName}
-                />
-              </div>
-              <div>
-                <Label htmlFor="projectDescription">Description</Label>
-                <Input
-                  id="projectDescription"
-                  onChange={(e) => setProjectDescription(e.target.value)}
-                  placeholder="What are you trying to achieve?"
-                  value={projectDescription}
-                />
-              </div>
+              <FormField
+                error={formErrors.projectName}
+                id="projectName"
+                label="Project Name"
+                maxLength={100}
+                onChange={setProjectName}
+                placeholder="e.g., Learn Spanish, Build a side project..."
+                required
+                showCharCount
+                value={projectName}
+              />
+              <FormTextarea
+                description="What are you trying to achieve? (optional)"
+                id="projectDescription"
+                label="Description"
+                maxLength={500}
+                onChange={setProjectDescription}
+                placeholder="Describe your goal and why it matters to you..."
+                rows={3}
+                showCharCount
+                value={projectDescription}
+              />
               <div className="flex gap-2">
                 <Button size="sm" type="submit">
                   Create Project
@@ -409,6 +416,7 @@ function DashboardContent({
   setProjectName,
   projectDescription,
   setProjectDescription,
+  formErrors,
 }: DashboardContentProps) {
   const stats = {
     totalProjects: projects?.length || 0,
@@ -424,6 +432,7 @@ function DashboardContent({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <ProjectsSection
+          formErrors={formErrors}
           onCreateProject={onCreateProject}
           projectDescription={projectDescription}
           projectName={projectName}
@@ -446,6 +455,10 @@ export default function Dashboard() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
+  const [formErrors, setFormErrors] = useState<{
+    projectName?: string;
+    projectDescription?: string;
+  }>({});
 
   // Ensure user is synced in Convex
   const getOrCreateUser = useMutation(api.users.getOrCreate);
@@ -461,20 +474,49 @@ export default function Dashboard() {
     }
   }, [user, getOrCreateUser]);
 
+  // Validation handlers
+  const validateProjectName = useCallback((name: string) => {
+    const error = validation.projectName(name);
+    setFormErrors((prev) => ({ ...prev, projectName: error || undefined }));
+    return !error;
+  }, []);
+
+  const debouncedValidateProjectName = useCallback(
+    debounce(validateProjectName, DEBOUNCE_DELAY),
+    []
+  );
+
+  const handleProjectNameChange = useCallback(
+    (name: string) => {
+      setProjectName(name);
+      if (name.trim()) {
+        debouncedValidateProjectName(name);
+      } else {
+        setFormErrors((prev) => ({ ...prev, projectName: undefined }));
+      }
+    },
+    [debouncedValidateProjectName]
+  );
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectName.trim()) {
-      toast.error('Please enter a project name');
+
+    // Validate all fields
+    const isNameValid = validateProjectName(projectName);
+
+    if (!isNameValid) {
+      toast.error('Please fix the errors before submitting');
       return;
     }
 
     try {
       await createProject({
-        name: projectName,
-        description: projectDescription,
+        name: projectName.trim(),
+        description: projectDescription.trim(),
       });
       setProjectName('');
       setProjectDescription('');
+      setFormErrors({});
       setShowCreateForm(false);
       toast.success('Project created successfully!');
     } catch (error) {
@@ -491,13 +533,14 @@ export default function Dashboard() {
       <Authenticated>
         <DashboardContent
           currentUser={currentUser}
+          formErrors={formErrors}
           onCreateProject={handleCreateProject}
           projectDescription={projectDescription}
           projectName={projectName}
           projects={projects}
           recentActions={recentActions}
           setProjectDescription={setProjectDescription}
-          setProjectName={setProjectName}
+          setProjectName={handleProjectNameChange}
           setShowCreateForm={setShowCreateForm}
           showCreateForm={showCreateForm}
           user={user}
