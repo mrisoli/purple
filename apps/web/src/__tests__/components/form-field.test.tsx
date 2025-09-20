@@ -25,7 +25,7 @@ describe('FormField Component', () => {
     render(<FormField {...defaultProps} required />);
 
     const label = screen.getByText('Test Field');
-    expect(label.parentElement).toHaveTextContent('Test Field *');
+    expect(label.parentElement).toHaveTextContent('Test Field*');
   });
 
   it('should call onChange when input value changes', () => {
@@ -90,7 +90,7 @@ describe('FormField Component', () => {
     render(
       <FormField
         {...defaultProps}
-        value="a".repeat(95) // 95% of 100 character limit
+        value={'a'.repeat(95)} // 95% of 100 character limit
         maxLength={100}
         showCharCount
       />
