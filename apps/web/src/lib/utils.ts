@@ -53,6 +53,7 @@ export const validation = {
 };
 
 // Debounce utility for input validation
+// biome-ignore lint/suspicious/noExplicitAny: Generic utility function needs flexibility
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number

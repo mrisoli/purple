@@ -1,5 +1,10 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { debounce } from '@/lib/utils';
+
+// Test constants to avoid magic numbers
+const DEBOUNCE_DELAY = 100;
+const HALF_DELAY = 50;
+const TEST_NUMBER = 123;
 
 describe('Debounce utility', () => {
   beforeEach(() => {
@@ -12,19 +17,19 @@ describe('Debounce utility', () => {
 
   it('should call function after specified delay', () => {
     const mockFn = vi.fn();
-    const debouncedFn = debounce(mockFn, 100);
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
     debouncedFn('test');
     expect(mockFn).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(DEBOUNCE_DELAY);
     expect(mockFn).toHaveBeenCalledWith('test');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
   it('should debounce multiple calls', () => {
     const mockFn = vi.fn();
-    const debouncedFn = debounce(mockFn, 100);
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
     debouncedFn('first');
     debouncedFn('second');
@@ -32,46 +37,46 @@ describe('Debounce utility', () => {
 
     expect(mockFn).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(DEBOUNCE_DELAY);
     expect(mockFn).toHaveBeenCalledWith('third');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
   it('should reset timer on subsequent calls', () => {
     const mockFn = vi.fn();
-    const debouncedFn = debounce(mockFn, 100);
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
     debouncedFn('first');
-    vi.advanceTimersByTime(50);
+    vi.advanceTimersByTime(HALF_DELAY);
     debouncedFn('second');
-    vi.advanceTimersByTime(50);
-    
+    vi.advanceTimersByTime(HALF_DELAY);
+
     expect(mockFn).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(50);
+    vi.advanceTimersByTime(HALF_DELAY);
     expect(mockFn).toHaveBeenCalledWith('second');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
 
   it('should work with functions that have multiple parameters', () => {
     const mockFn = vi.fn();
-    const debouncedFn = debounce(mockFn, 100);
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
-    debouncedFn('param1', 'param2', 123);
-    vi.advanceTimersByTime(100);
+    debouncedFn('param1', 'param2', TEST_NUMBER);
+    vi.advanceTimersByTime(DEBOUNCE_DELAY);
 
-    expect(mockFn).toHaveBeenCalledWith('param1', 'param2', 123);
+    expect(mockFn).toHaveBeenCalledWith('param1', 'param2', TEST_NUMBER);
   });
 
   it('should work with functions that return values', () => {
     const mockFn = vi.fn(() => 'result');
-    const debouncedFn = debounce(mockFn, 100);
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
     // Note: debounced functions don't return values since they're async
     const result = debouncedFn('test');
     expect(result).toBeUndefined();
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(DEBOUNCE_DELAY);
     expect(mockFn).toHaveBeenCalledWith('test');
   });
 });

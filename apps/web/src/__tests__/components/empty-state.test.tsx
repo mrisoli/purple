@@ -1,28 +1,30 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { Target } from 'lucide-react';
+import { describe, expect, it, vi } from 'vitest';
 import { EmptyState } from '@/components/empty-state';
 
 describe('EmptyState Component', () => {
   it('should render title and description', () => {
     render(
       <EmptyState
+        description="Create your first project to get started!"
         icon={Target}
         title="No projects yet"
-        description="Create your first project to get started!"
       />
     );
 
     expect(screen.getByText('No projects yet')).toBeInTheDocument();
-    expect(screen.getByText('Create your first project to get started!')).toBeInTheDocument();
+    expect(
+      screen.getByText('Create your first project to get started!')
+    ).toBeInTheDocument();
   });
 
   it('should render icon', () => {
     render(
       <EmptyState
+        description="Test Description"
         icon={Target}
         title="Test Title"
-        description="Test Description"
       />
     );
 
@@ -33,16 +35,16 @@ describe('EmptyState Component', () => {
 
   it('should render action button when action prop is provided', () => {
     const mockAction = vi.fn();
-    
+
     render(
       <EmptyState
-        icon={Target}
-        title="No projects yet"
-        description="Create your first project to get started!"
         action={{
           label: 'Create Project',
           onClick: mockAction,
         }}
+        description="Create your first project to get started!"
+        icon={Target}
+        title="No projects yet"
       />
     );
 
@@ -53,9 +55,9 @@ describe('EmptyState Component', () => {
   it('should not render action button when action prop is not provided', () => {
     render(
       <EmptyState
+        description="Create your first project to get started!"
         icon={Target}
         title="No projects yet"
-        description="Create your first project to get started!"
       />
     );
 
@@ -65,32 +67,32 @@ describe('EmptyState Component', () => {
 
   it('should call action.onClick when button is clicked', () => {
     const mockAction = vi.fn();
-    
+
     render(
       <EmptyState
-        icon={Target}
-        title="No projects yet"
-        description="Create your first project to get started!"
         action={{
           label: 'Create Project',
           onClick: mockAction,
         }}
+        description="Create your first project to get started!"
+        icon={Target}
+        title="No projects yet"
       />
     );
 
     const button = screen.getByRole('button', { name: 'Create Project' });
     fireEvent.click(button);
-    
+
     expect(mockAction).toHaveBeenCalledTimes(1);
   });
 
   it('should apply custom className', () => {
     const { container } = render(
       <EmptyState
+        className="custom-class"
+        description="Test Description"
         icon={Target}
         title="Test Title"
-        description="Test Description"
-        className="custom-class"
       />
     );
 

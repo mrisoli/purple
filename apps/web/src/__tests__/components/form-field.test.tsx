@@ -1,6 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FormField } from '@/components/form-field';
+
+// Test constants to avoid magic numbers
+const WARNING_THRESHOLD_95 = 95;
 
 describe('FormField Component', () => {
   const defaultProps = {
@@ -48,16 +51,23 @@ describe('FormField Component', () => {
     render(<FormField {...defaultProps} error="This field is required" />);
 
     expect(screen.getByText('This field is required')).toBeInTheDocument();
-    
+
     // Check that input has error styling
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('should show description when description prop is provided', () => {
-    render(<FormField {...defaultProps} description="This is a helpful description" />);
+    render(
+      <FormField
+        {...defaultProps}
+        description="This is a helpful description"
+      />
+    );
 
-    expect(screen.getByText('This is a helpful description')).toBeInTheDocument();
+    expect(
+      screen.getByText('This is a helpful description')
+    ).toBeInTheDocument();
   });
 
   it('should hide description when error is present', () => {
@@ -70,16 +80,18 @@ describe('FormField Component', () => {
     );
 
     expect(screen.getByText('This field is required')).toBeInTheDocument();
-    expect(screen.queryByText('This is a helpful description')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This is a helpful description')
+    ).not.toBeInTheDocument();
   });
 
   it('should show character count when showCharCount and maxLength are provided', () => {
     render(
       <FormField
         {...defaultProps}
-        value="hello"
         maxLength={100}
         showCharCount
+        value="hello"
       />
     );
 
@@ -90,9 +102,9 @@ describe('FormField Component', () => {
     render(
       <FormField
         {...defaultProps}
-        value={'a'.repeat(95)} // 95% of 100 character limit
-        maxLength={100}
+        maxLength={100} // 95% of 100 character limit
         showCharCount
+        value={'a'.repeat(WARNING_THRESHOLD_95)}
       />
     );
 
@@ -104,9 +116,9 @@ describe('FormField Component', () => {
     render(
       <FormField
         {...defaultProps}
-        value="hello"
         maxLength={100}
         showCharCount
+        value="hello"
       />
     );
 
@@ -133,7 +145,7 @@ describe('FormField Component', () => {
 
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('aria-describedby', 'test-field-error');
-    
+
     const errorElement = document.getElementById('test-field-error');
     expect(errorElement).toBeInTheDocument();
   });
@@ -143,8 +155,10 @@ describe('FormField Component', () => {
 
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('aria-describedby', 'test-field-description');
-    
-    const descriptionElement = document.getElementById('test-field-description');
+
+    const descriptionElement = document.getElementById(
+      'test-field-description'
+    );
     expect(descriptionElement).toBeInTheDocument();
   });
 });
