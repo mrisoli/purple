@@ -14,8 +14,8 @@ describe('Debounce utility', () => {
     expect(mockFn).not.toHaveBeenCalled();
 
     // Wait for the debounce delay plus a bit more
-    await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_DELAY + 10));
+
     expect(mockFn).toHaveBeenCalledWith('test');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
@@ -31,8 +31,8 @@ describe('Debounce utility', () => {
     expect(mockFn).not.toHaveBeenCalled();
 
     // Wait for the debounce delay
-    await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_DELAY + 10));
+
     expect(mockFn).toHaveBeenCalledWith('third');
     expect(mockFn).toHaveBeenCalledTimes(1);
   });
@@ -42,10 +42,10 @@ describe('Debounce utility', () => {
     const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
 
     debouncedFn('param1', 'param2', TEST_NUMBER);
-    
+
     // Wait for the debounce delay
-    await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_DELAY + 10));
+
     expect(mockFn).toHaveBeenCalledWith('param1', 'param2', TEST_NUMBER);
   });
 
@@ -58,8 +58,8 @@ describe('Debounce utility', () => {
     expect(result).toBeUndefined();
 
     // Wait for the debounce delay
-    await new Promise(resolve => setTimeout(resolve, DEBOUNCE_DELAY + 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, DEBOUNCE_DELAY + 10));
+
     expect(mockFn).toHaveBeenCalledWith('test');
   });
 
@@ -69,7 +69,7 @@ describe('Debounce utility', () => {
 
     // Should create a debounced function
     expect(typeof debouncedFn).toBe('function');
-    
+
     // Should not call immediately
     debouncedFn('test');
     expect(mockFn).not.toHaveBeenCalled();

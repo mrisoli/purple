@@ -1,9 +1,26 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
 import React from 'react';
+import { vi } from 'vitest';
 
 // Configure vitest environment
 globalThis.vi = vi;
+
+// Type definitions for mock components
+type LinkProps = {
+  children: React.ReactNode;
+  href: string;
+  [key: string]: unknown;
+};
+
+type ClerkButtonProps = {
+  children?: React.ReactNode;
+  mode?: string;
+  [key: string]: unknown;
+};
+
+type AuthProps = {
+  children: React.ReactNode;
+};
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
@@ -21,19 +38,31 @@ vi.mock('next/navigation', () => ({
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({
-  default: ({ children, href, ...props }: any) => {
+  default: ({ children, href, ...props }: LinkProps) => {
     return React.createElement('a', { href, ...props }, children);
   },
 }));
 
 // Mock Clerk components
 vi.mock('@clerk/nextjs', () => ({
-  SignInButton: ({ children, mode, ...props }: any) => 
-    React.createElement('button', { 'data-testid': 'sign-in-button', ...props }, children),
-  SignUpButton: ({ children, mode, ...props }: any) => 
-    React.createElement('button', { 'data-testid': 'sign-up-button', ...props }, children),
-  UserButton: (props: any) => 
-    React.createElement('button', { 'data-testid': 'user-button', ...props }),
+  SignInButton: ({ children, ...props }: ClerkButtonProps) =>
+    React.createElement(
+      'button',
+      { 'data-testid': 'sign-in-button', type: 'button', ...props },
+      children
+    ),
+  SignUpButton: ({ children, ...props }: ClerkButtonProps) =>
+    React.createElement(
+      'button',
+      { 'data-testid': 'sign-up-button', type: 'button', ...props },
+      children
+    ),
+  UserButton: (props: ClerkButtonProps) =>
+    React.createElement('button', {
+      'data-testid': 'user-button',
+      type: 'button',
+      ...props,
+    }),
   useUser: () => ({
     user: null,
     isLoaded: true,
@@ -42,10 +71,10 @@ vi.mock('@clerk/nextjs', () => ({
 
 // Mock Convex React components
 vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: any) => children,
-  Unauthenticated: ({ children }: any) => children,
-  AuthLoading: ({ children }: any) => children,
-  useQuery: () => undefined,
+  Authenticated: ({ children }: AuthProps) => children,
+  Unauthenticated: ({ children }: AuthProps) => children,
+  AuthLoading: ({ children }: AuthProps) => children,
+  useQuery: () => null,
   useMutation: () => vi.fn(),
 }));
 
