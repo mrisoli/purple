@@ -28,13 +28,25 @@ vi.mock('@clerk/nextjs', () => ({
     },
     isLoaded: true,
   }),
-  SignInButton: ({ children, ...props }: { children?: React.ReactNode; [key: string]: any }) =>
+  SignInButton: ({
+    children,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    [key: string]: any;
+  }) =>
     React.createElement(
       'button',
       { 'data-testid': 'sign-in-button', type: 'button', ...props },
       children
     ),
-  SignUpButton: ({ children, ...props }: { children?: React.ReactNode; [key: string]: any }) =>
+  SignUpButton: ({
+    children,
+    ...props
+  }: {
+    children?: React.ReactNode;
+    [key: string]: any;
+  }) =>
     React.createElement(
       'button',
       { 'data-testid': 'sign-up-button', type: 'button', ...props },
@@ -56,10 +68,10 @@ describe.skip('User Journey Integration Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup mock implementations
     mockUseMutation.mockReturnValue(mockCreateProject);
-    
+
     // Setup default mock returns for useQuery calls
     mockUseQuery
       .mockReturnValueOnce({ _id: 'user-1', premium: false }) // currentUser
@@ -81,30 +93,41 @@ describe.skip('User Journey Integration Tests', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No projects yet')).toBeInTheDocument();
-      expect(screen.getByText('Create your first project to start your accountability journey!')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Create your first project to start your accountability journey!'
+        )
+      ).toBeInTheDocument();
     });
   });
 
   it('allows creating a new project', async () => {
     const user = userEvent.setup();
-    
+
     mockCreateProject.mockResolvedValue({ _id: 'new-project-id' });
 
     render(<Dashboard />);
 
     // Click "New Project" button
-    const newProjectButton = screen.getByRole('button', { name: /new project/i });
+    const newProjectButton = screen.getByRole('button', {
+      name: /new project/i,
+    });
     await user.click(newProjectButton);
 
     // Fill out project form
     const nameInput = screen.getByLabelText(/project name/i);
     const descriptionInput = screen.getByLabelText(/description/i);
-    
+
     await user.type(nameInput, 'Learn TypeScript');
-    await user.type(descriptionInput, 'Master TypeScript fundamentals and advanced concepts');
+    await user.type(
+      descriptionInput,
+      'Master TypeScript fundamentals and advanced concepts'
+    );
 
     // Submit form
-    const createButton = screen.getByRole('button', { name: /create project/i });
+    const createButton = screen.getByRole('button', {
+      name: /create project/i,
+    });
     await user.click(createButton);
 
     // Verify project creation was called
@@ -121,37 +144,39 @@ describe.skip('User Journey Integration Tests', () => {
     vi.clearAllMocks();
     mockUseMutation.mockClear();
     mockUseQuery.mockClear();
-    
+
     // Mock with existing projects
     mockUseQuery
       .mockReturnValueOnce({ _id: 'user-1', premium: false }) // currentUser
-      .mockReturnValueOnce([  // projects
+      .mockReturnValueOnce([
+        // projects
         {
           _id: 'project-1',
           name: 'Learn React',
           description: 'Master React fundamentals',
           buddyId: 'buddy-1',
-          createdAt: Date.now() - 86400000,
+          createdAt: Date.now() - 86_400_000,
         },
         {
           _id: 'project-2',
           name: 'Build Portfolio',
           description: 'Create an awesome portfolio website',
           buddyId: null,
-          createdAt: Date.now() - 172800000,
+          createdAt: Date.now() - 172_800_000,
         },
       ])
-      .mockReturnValueOnce([ // recentActions
+      .mockReturnValueOnce([
+        // recentActions
         {
           _id: 'action-1',
           type: 'progress_update',
           message: 'Completed first chapter',
-          createdAt: Date.now() - 3600000,
+          createdAt: Date.now() - 3_600_000,
           user: { name: 'Test User' },
           project: { name: 'Learn React' },
         },
       ]);
-    
+
     mockUseMutation.mockReturnValue(mockCreateProject);
     mockUseMutation.mockReturnValue(mockGetOrCreateUser);
 
@@ -175,11 +200,12 @@ describe.skip('User Journey Integration Tests', () => {
     vi.clearAllMocks();
     mockUseMutation.mockClear();
     mockUseQuery.mockClear();
-    
+
     // Mock free user with one project (at limit)
     mockUseQuery
       .mockReturnValueOnce({ _id: 'user-1', premium: false }) // currentUser
-      .mockReturnValueOnce([  // projects
+      .mockReturnValueOnce([
+        // projects
         {
           _id: 'project-1',
           name: 'Learn React',
@@ -189,7 +215,7 @@ describe.skip('User Journey Integration Tests', () => {
         },
       ])
       .mockReturnValueOnce([]); // recentActions
-    
+
     mockUseMutation.mockReturnValue(mockCreateProject);
     mockUseMutation.mockReturnValue(mockGetOrCreateUser);
 
@@ -197,7 +223,9 @@ describe.skip('User Journey Integration Tests', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Unlock More Projects')).toBeInTheDocument();
-      expect(screen.getByText('You\'ve used your free project!')).toBeInTheDocument();
+      expect(
+        screen.getByText("You've used your free project!")
+      ).toBeInTheDocument();
     });
   });
 
@@ -207,11 +235,15 @@ describe.skip('User Journey Integration Tests', () => {
     render(<Dashboard />);
 
     // Click "New Project" button
-    const newProjectButton = screen.getByRole('button', { name: /new project/i });
+    const newProjectButton = screen.getByRole('button', {
+      name: /new project/i,
+    });
     await user.click(newProjectButton);
 
     // Try to submit without required fields
-    const createButton = screen.getByRole('button', { name: /create project/i });
+    const createButton = screen.getByRole('button', {
+      name: /create project/i,
+    });
     await user.click(createButton);
 
     // Should show validation error (from our validation logic)
