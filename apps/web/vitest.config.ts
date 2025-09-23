@@ -5,10 +5,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: ['./src/__tests__/setup.ts'],
     globals: true,
-    pool: 'forks',
+    pool: 'threads',
   },
   resolve: {
     alias: {

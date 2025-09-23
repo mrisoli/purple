@@ -2,49 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock Clerk
-vi.mock('@clerk/nextjs', () => ({
-  SignInButton: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="sign-in-button">{children}</div>
-  ),
-  UserButton: () => <div data-testid="user-button">User Menu</div>,
-  useUser: () => ({
-    user: {
-      id: 'test-user-id',
-      fullName: 'Test User',
-      firstName: 'Test',
-      emailAddresses: [{ emailAddress: 'test@example.com' }],
-    },
-  }),
-}));
-
-// Mock Convex
-vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Unauthenticated: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  AuthLoading: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  useQuery: vi.fn(),
-  useMutation: vi.fn(),
-}));
-
-// Mock Next.js router
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    back: vi.fn(),
-  }),
-  useSearchParams: () => new URLSearchParams(),
-}));
-
-// Mock toast
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 import Dashboard from '@/app/dashboard/page';
 import { useMutation, useQuery } from 'convex/react';
 
