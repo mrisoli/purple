@@ -74,15 +74,15 @@ export default function Home() {
           </Authenticated>
           <Unauthenticated>
             <SignUpButton mode="modal">
-              <Button size="lg">
+              <button className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                 Get Started Free
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </button>
             </SignUpButton>
             <SignInButton mode="modal">
-              <Button size="lg" variant="outline">
+              <button className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 font-medium text-sm ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                 Sign In
-              </Button>
+              </button>
             </SignInButton>
           </Unauthenticated>
         </div>
@@ -188,10 +188,10 @@ export default function Home() {
           </Authenticated>
           <Unauthenticated>
             <SignUpButton mode="modal">
-              <Button size="lg">
+              <button className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                 Start Your Journey
                 <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              </button>
             </SignUpButton>
             <Button asChild size="lg" variant="outline">
               <Link href="/pricing">View Pricing</Link>
