@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { EmptyState } from '@/components/empty-state';
 import { FormField } from '@/components/form-field';
 import { FormTextarea } from '@/components/form-textarea';
+import { GoalTemplates } from '@/components/goal-templates';
 import { StripeCheckout } from '@/components/stripe-checkout';
 import { UserAnalytics } from '@/components/user-analytics';
 import { Button } from '@/components/ui/button';
@@ -189,7 +190,7 @@ function ProjectsSection({
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-semibold text-xl">Your Projects</h2>
         <Button
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={() => setShowTemplates(!showTemplates)}
           size="sm"
           variant="outline"
         >
@@ -197,6 +198,15 @@ function ProjectsSection({
           New Project
         </Button>
       </div>
+
+      {showTemplates && (
+        <div className="mb-6">
+          <GoalTemplates
+            onSelectTemplate={handleSelectTemplate}
+            onSkip={handleSkipTemplate}
+          />
+        </div>
+      )}
 
       {showCreateForm && (
         <Card className="mb-4">
@@ -232,7 +242,12 @@ function ProjectsSection({
                   Create Project
                 </Button>
                 <Button
-                  onClick={() => setShowCreateForm(false)}
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    setProjectName('');
+                    setProjectDescription('');
+                    setFormErrors({});
+                  }}
                   size="sm"
                   type="button"
                   variant="outline"
@@ -259,7 +274,7 @@ function ProjectsSection({
           <EmptyState
             action={{
               label: 'Create Your First Project',
-              onClick: () => setShowCreateForm(true),
+              onClick: () => setShowTemplates(true),
             }}
             description="Create your first project to start your accountability journey!"
             icon={Target}
@@ -458,12 +473,26 @@ function DashboardContent({
 export default function Dashboard() {
   const { user } = useUser();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [formErrors, setFormErrors] = useState<{
     projectName?: string;
     projectDescription?: string;
   }>({});
+
+  // Template handlers
+  const handleSelectTemplate = (template: any) => {
+    setProjectName(template.name);
+    setProjectDescription(template.description);
+    setShowTemplates(false);
+    setShowCreateForm(true);
+  };
+
+  const handleSkipTemplate = () => {
+    setShowTemplates(false);
+    setShowCreateForm(true);
+  };
 
   // Ensure user is synced in Convex
   const getOrCreateUser = useMutation(api.users.getOrCreate);

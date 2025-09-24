@@ -19,6 +19,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProgressRing } from '@/components/progress-ring';
 
 interface ProjectAnalyticsProps {
   projectId: Id<'projects'>;
@@ -123,34 +124,74 @@ export function ProjectAnalytics({ projectId }: ProjectAnalyticsProps) {
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Project Insights</CardTitle>
-          <CardDescription>
-            Analysis of your project activity
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="font-medium text-muted-foreground">Progress Updates</p>
-              <p className="text-lg font-semibold">{analytics.progressUpdates}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Project Progress</CardTitle>
+            <CardDescription>
+              Visual representation of your milestone completion
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center justify-center py-8">
+            <ProgressRing
+              progress={analytics.completionRate}
+              size={140}
+              strokeWidth={12}
+              label="Completed"
+              color={analytics.completionRate >= 75 ? 'hsl(142, 76%, 36%)' : 
+                     analytics.completionRate >= 50 ? 'hsl(48, 96%, 53%)' : 
+                     'hsl(220, 14%, 96%)'}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Activity Breakdown</CardTitle>
+            <CardDescription>
+              Distribution of your project activities
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Progress Updates</span>
+                </div>
+                <span className="font-semibold">{analytics.progressUpdates}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span className="text-sm">Milestones</span>
+                </div>
+                <span className="font-semibold">{analytics.milestoneReached}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                  <span className="text-sm">Challenges</span>
+                </div>
+                <span className="font-semibold">{analytics.challengesFaced}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="text-sm">Help Requests</span>
+                </div>
+                <span className="font-semibold">{analytics.helpRequests}</span>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-muted-foreground">Challenges</p>
-              <p className="text-lg font-semibold">{analytics.challengesFaced}</p>
+            <div className="pt-4 border-t">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Days Active</span>
+                <span className="font-medium">{analytics.daysSinceCreation}</span>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-muted-foreground">Help Requests</p>
-              <p className="text-lg font-semibold">{analytics.helpRequests}</p>
-            </div>
-            <div>
-              <p className="font-medium text-muted-foreground">Days Active</p>
-              <p className="text-lg font-semibold">{analytics.daysSinceCreation}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
