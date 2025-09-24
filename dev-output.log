@@ -1,0 +1,18 @@
+$ turbo -F web dev
+turbo 2.5.6
+
+ WARNING  Unable to calculate transitive closures: No lockfile entry found for '@emnapi/core'
+• Packages in scope: web
+• Running dev in 1 packages
+• Remote caching disabled
+web:dev: cache bypass, force executing 91a336ccb54ea50b
+web:dev: $ next dev --turbopack --port=3001
+web:dev:    ▲ Next.js 15.5.0 (Turbopack)
+web:dev:    - Local:        http://localhost:3001
+web:dev:    - Network:      http://116.203.125.181:3001
+web:dev:    - Environments: .env.local
+web:dev: 
+web:dev:  ✓ Starting...
+web:dev:  ○ Compiling middleware ...
+web:dev:  ✓ Compiled middleware in 792ms
+web:dev:  ✓ Ready in 2.5s

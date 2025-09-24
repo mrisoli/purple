@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ProjectAnalytics } from '@/components/project-analytics';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -193,6 +194,11 @@ export default function ProjectPage() {
               </div>
             </div>
             <UserButton />
+          </div>
+
+          {/* Project Analytics */}
+          <div className="mb-8">
+            <ProjectAnalytics projectId={projectId} />
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

@@ -24,6 +24,7 @@ import { EmptyState } from '@/components/empty-state';
 import { FormField } from '@/components/form-field';
 import { FormTextarea } from '@/components/form-textarea';
 import { StripeCheckout } from '@/components/stripe-checkout';
+import { UserAnalytics } from '@/components/user-analytics';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -429,6 +430,10 @@ function DashboardContent({
     <div className="container mx-auto max-w-6xl px-4 py-8">
       <DashboardHeader currentUser={currentUser} user={user} />
       <StatsCards currentUser={currentUser} stats={stats} />
+
+      <div className="mb-8">
+        <UserAnalytics />
+      </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <ProjectsSection
