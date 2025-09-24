@@ -1,6 +1,13 @@
 'use client';
 
-import { BookOpen, Code, Dumbbell, DollarSign, Heart, Target } from 'lucide-react';
+import {
+  BookOpen,
+  Code,
+  DollarSign,
+  Dumbbell,
+  Heart,
+  Target,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -110,23 +117,26 @@ const templates: GoalTemplate[] = [
   },
 ];
 
-export function GoalTemplates({ onSelectTemplate, onSkip }: GoalTemplatesProps) {
+export function GoalTemplates({
+  onSelectTemplate,
+  onSkip,
+}: GoalTemplatesProps) {
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h3 className="text-2xl font-bold">Choose Your Goal Category</h3>
+      <div className="space-y-2 text-center">
+        <h3 className="font-bold text-2xl">Choose Your Goal Category</h3>
         <p className="text-muted-foreground">
           Select a template to get started quickly, or create a custom goal
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {templates.map((template) => {
           const Icon = template.icon;
           return (
             <Card
+              className="hover:-translate-y-1 cursor-pointer transition-all hover:shadow-lg"
               key={template.id}
-              className="cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1"
               onClick={() => onSelectTemplate(template)}
             >
               <CardHeader className="text-center">
@@ -141,10 +151,10 @@ export function GoalTemplates({ onSelectTemplate, onSkip }: GoalTemplatesProps) 
               <CardContent>
                 <div className="space-y-1">
                   <p className="font-medium text-sm">Examples:</p>
-                  <ul className="text-xs text-muted-foreground space-y-1">
+                  <ul className="space-y-1 text-muted-foreground text-xs">
                     {template.examples.slice(0, 3).map((example, index) => (
-                      <li key={index} className="flex items-center gap-1">
-                        <span className="h-1 w-1 bg-current rounded-full" />
+                      <li className="flex items-center gap-1" key={index}>
+                        <span className="h-1 w-1 rounded-full bg-current" />
                         {example}
                       </li>
                     ))}
@@ -157,7 +167,7 @@ export function GoalTemplates({ onSelectTemplate, onSkip }: GoalTemplatesProps) 
       </div>
 
       <div className="flex justify-center">
-        <Button variant="outline" onClick={onSkip}>
+        <Button onClick={onSkip} variant="outline">
           Skip Templates - Create Custom Project
         </Button>
       </div>

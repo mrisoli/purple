@@ -25,7 +25,6 @@ import { FormField } from '@/components/form-field';
 import { FormTextarea } from '@/components/form-textarea';
 import { GoalTemplates } from '@/components/goal-templates';
 import { StripeCheckout } from '@/components/stripe-checkout';
-import { UserAnalytics } from '@/components/user-analytics';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -35,6 +34,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { UserAnalytics } from '@/components/user-analytics';
 import { DEBOUNCE_DELAY, debounce, validation } from '@/lib/utils';
 
 type Project = {
@@ -71,7 +71,10 @@ type DashboardContentProps = {
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
   formErrors: { projectName?: string; projectDescription?: string };
-  setFormErrors: (errors: { projectName?: string; projectDescription?: string }) => void;
+  setFormErrors: (errors: {
+    projectName?: string;
+    projectDescription?: string;
+  }) => void;
   showTemplates: boolean;
   setShowTemplates: (show: boolean) => void;
   handleSelectTemplate: (template: any) => void;
@@ -194,7 +197,10 @@ function ProjectsSection({
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
   formErrors: { projectName?: string; projectDescription?: string };
-  setFormErrors: (errors: { projectName?: string; projectDescription?: string }) => void;
+  setFormErrors: (errors: {
+    projectName?: string;
+    projectDescription?: string;
+  }) => void;
   showTemplates: boolean;
   setShowTemplates: (show: boolean) => void;
   handleSelectTemplate: (template: any) => void;

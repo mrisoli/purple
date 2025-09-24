@@ -24,38 +24,40 @@ export function ProgressRing({
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className={`relative inline-flex items-center justify-center ${className}`}>
-      <svg width={size} height={size} className="transform -rotate-90">
+    <div
+      className={`relative inline-flex items-center justify-center ${className}`}
+    >
+      <svg className="-rotate-90 transform" height={size} width={size}>
         {/* Background circle */}
         <circle
           cx={size / 2}
           cy={size / 2}
+          fill="transparent"
+          opacity={0.3}
           r={radius}
           stroke="hsl(var(--muted))"
           strokeWidth={strokeWidth}
-          fill="transparent"
-          opacity={0.3}
         />
         {/* Progress circle */}
         <circle
+          className="transition-all duration-300 ease-in-out"
           cx={size / 2}
           cy={size / 2}
+          fill="transparent"
           r={radius}
           stroke={color}
-          strokeWidth={strokeWidth}
-          fill="transparent"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="transition-all duration-300 ease-in-out"
+          strokeWidth={strokeWidth}
         />
       </svg>
       {showLabel && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl font-bold">{Math.round(progress)}%</div>
+            <div className="font-bold text-2xl">{Math.round(progress)}%</div>
             {label && (
-              <div className="text-xs text-muted-foreground mt-1">{label}</div>
+              <div className="mt-1 text-muted-foreground text-xs">{label}</div>
             )}
           </div>
         </div>

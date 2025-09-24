@@ -38,32 +38,45 @@ export const getProjectAnalytics = query({
 
     // Calculate analytics
     const totalActions = actions.length;
-    const milestoneReached = actions.filter(a => a.type === 'milestone_reached').length;
-    const progressUpdates = actions.filter(a => a.type === 'progress_update').length;
-    const challengesFaced = actions.filter(a => a.type === 'challenge_faced').length;
-    const helpRequests = actions.filter(a => a.type === 'help_needed').length;
+    const milestoneReached = actions.filter(
+      (a) => a.type === 'milestone_reached'
+    ).length;
+    const progressUpdates = actions.filter(
+      (a) => a.type === 'progress_update'
+    ).length;
+    const challengesFaced = actions.filter(
+      (a) => a.type === 'challenge_faced'
+    ).length;
+    const helpRequests = actions.filter((a) => a.type === 'help_needed').length;
 
     // Calculate engagement metrics
-    const daysSinceCreation = Math.floor((Date.now() - project.createdAt) / (1000 * 60 * 60 * 24));
-    const avgActionsPerDay = daysSinceCreation > 0 ? totalActions / daysSinceCreation : 0;
+    const daysSinceCreation = Math.floor(
+      (Date.now() - project.createdAt) / (1000 * 60 * 60 * 24)
+    );
+    const avgActionsPerDay =
+      daysSinceCreation > 0 ? totalActions / daysSinceCreation : 0;
 
     // Recent activity (last 7 days)
-    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-    const recentActions = actions.filter(a => a.createdAt > sevenDaysAgo).length;
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recentActions = actions.filter(
+      (a) => a.createdAt > sevenDaysAgo
+    ).length;
 
     // Activity streak (consecutive days with actions)
     const actionDates = actions
-      .map(a => new Date(a.createdAt).toDateString())
+      .map((a) => new Date(a.createdAt).toDateString())
       .filter((date, index, array) => array.indexOf(date) === index)
       .sort();
-    
+
     let currentStreak = 0;
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
-    
+
     if (actionDates.includes(today) || actionDates.includes(yesterday)) {
-      let checkDate = actionDates.includes(today) ? new Date() : new Date(Date.now() - 24 * 60 * 60 * 1000);
-      
+      let checkDate = actionDates.includes(today)
+        ? new Date()
+        : new Date(Date.now() - 24 * 60 * 60 * 1000);
+
       while (actionDates.includes(checkDate.toDateString())) {
         currentStreak++;
         checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
@@ -80,7 +93,10 @@ export const getProjectAnalytics = query({
       avgActionsPerDay: Number(avgActionsPerDay.toFixed(2)),
       recentActions,
       currentStreak,
-      completionRate: totalActions > 0 ? Number(((milestoneReached / totalActions) * 100).toFixed(1)) : 0,
+      completionRate:
+        totalActions > 0
+          ? Number(((milestoneReached / totalActions) * 100).toFixed(1))
+          : 0,
     };
   },
 });
@@ -118,18 +134,28 @@ export const getUserAnalytics = query({
     }
 
     const totalProjects = projects.length;
-    const projectsWithBuddy = projects.filter(p => p.buddyId).length;
+    const projectsWithBuddy = projects.filter((p) => p.buddyId).length;
     const totalActions = allActions.length;
-    const totalMilestones = allActions.filter(a => a.type === 'milestone_reached').length;
+    const totalMilestones = allActions.filter(
+      (a) => a.type === 'milestone_reached'
+    ).length;
 
     // Most active day of week
     const dayActions = Array(7).fill(0);
-    allActions.forEach(action => {
+    allActions.forEach((action) => {
       const dayOfWeek = new Date(action.createdAt).getDay();
       dayActions[dayOfWeek]++;
     });
-    
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const dayNames = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
     const mostActiveDay = dayNames[dayActions.indexOf(Math.max(...dayActions))];
 
     return {
@@ -137,8 +163,14 @@ export const getUserAnalytics = query({
       projectsWithBuddy,
       totalActions,
       totalMilestones,
-      avgActionsPerProject: totalProjects > 0 ? Number((totalActions / totalProjects).toFixed(2)) : 0,
-      buddyMatchRate: totalProjects > 0 ? Number(((projectsWithBuddy / totalProjects) * 100).toFixed(1)) : 0,
+      avgActionsPerProject:
+        totalProjects > 0
+          ? Number((totalActions / totalProjects).toFixed(2))
+          : 0,
+      buddyMatchRate:
+        totalProjects > 0
+          ? Number(((projectsWithBuddy / totalProjects) * 100).toFixed(1))
+          : 0,
       mostActiveDay,
     };
   },

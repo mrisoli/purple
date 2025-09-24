@@ -2,20 +2,20 @@
 
 import { api } from '@purple/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
-import { 
-  Activity, 
+import {
+  Activity,
   Calendar,
   CheckCircle,
   FolderOpen,
   Target,
-  Users
+  Users,
 } from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -30,9 +30,9 @@ export function UserAnalytics() {
           <Skeleton className="h-4 w-48" />
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="space-y-2">
+              <div className="space-y-2" key={i}>
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-8 w-12" />
               </div>
@@ -91,32 +91,35 @@ export function UserAnalytics() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
           {stats.map(({ icon: Icon, label, value, color }) => (
-            <div key={label} className="text-center space-y-2">
+            <div className="space-y-2 text-center" key={label}>
               <div className="flex items-center justify-center">
                 <Icon className={`h-5 w-5 ${color}`} />
               </div>
-              <div className="text-2xl font-bold">{value}</div>
-              <p className="text-sm text-muted-foreground">{label}</p>
+              <div className="font-bold text-2xl">{value}</div>
+              <p className="text-muted-foreground text-sm">{label}</p>
             </div>
           ))}
         </div>
-        
+
         {analytics.totalProjects > 0 && (
-          <div className="mt-6 pt-4 border-t space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Buddy Match Rate</span>
-              <span className="text-sm font-semibold">{analytics.buddyMatchRate}%</span>
+          <div className="mt-6 space-y-2 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-sm">Buddy Match Rate</span>
+              <span className="font-semibold text-sm">
+                {analytics.buddyMatchRate}%
+              </span>
             </div>
-            <div className="w-full bg-secondary rounded-full h-2">
-              <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300" 
+            <div className="h-2 w-full rounded-full bg-secondary">
+              <div
+                className="h-2 rounded-full bg-primary transition-all duration-300"
                 style={{ width: `${analytics.buddyMatchRate}%` }}
               />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {analytics.projectsWithBuddy} of {analytics.totalProjects} projects have accountability buddies
+            <p className="text-muted-foreground text-xs">
+              {analytics.projectsWithBuddy} of {analytics.totalProjects}{' '}
+              projects have accountability buddies
             </p>
           </div>
         )}

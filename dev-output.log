@@ -16,3 +16,9 @@ web:dev:  ✓ Starting...
 web:dev:  ○ Compiling middleware ...
 web:dev:  ✓ Compiled middleware in 792ms
 web:dev:  ✓ Ready in 2.5s
+web:dev: [?25h
+
+ Tasks:    1 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    1h18m17.57s 
+
