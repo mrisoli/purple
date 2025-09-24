@@ -33,7 +33,8 @@ describe('Simple Integration Tests', () => {
     expect(validation.projectName('ab')).toBe(
       'Project name must be at least 3 characters'
     );
-    expect(validation.projectName('a'.repeat(101))).toBe(
+    const MAX_PROJECT_NAME_LENGTH = 101;
+    expect(validation.projectName('a'.repeat(MAX_PROJECT_NAME_LENGTH))).toBe(
       'Project name must be less than 100 characters'
     );
     expect(validation.projectName('Valid Project Name')).toBe(null);
@@ -56,8 +57,9 @@ describe('Simple Integration Tests', () => {
     // Test debounce function exists and is callable
     expect(typeof debounce).toBe('function');
 
-    const mockFn = vi.fn();
-    const debouncedFn = debounce(mockFn, 100);
+    const mockFn = vitest.fn();
+    const DEBOUNCE_DELAY = 100;
+    const debouncedFn = debounce(mockFn, DEBOUNCE_DELAY);
     expect(typeof debouncedFn).toBe('function');
   });
 });
