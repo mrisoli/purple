@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { EmptyState } from '@/components/empty-state';
 import { FormField } from '@/components/form-field';
 import { FormTextarea } from '@/components/form-textarea';
-import { GoalTemplates } from '@/components/goal-templates';
+import { type GoalTemplate, GoalTemplates } from '@/components/goal-templates';
 import { StripeCheckout } from '@/components/stripe-checkout';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,7 +77,7 @@ type DashboardContentProps = {
   }) => void;
   showTemplates: boolean;
   setShowTemplates: (show: boolean) => void;
-  handleSelectTemplate: (template: any) => void;
+  handleSelectTemplate: (template: GoalTemplate) => void;
   handleSkipTemplate: () => void;
 };
 
@@ -203,7 +203,7 @@ function ProjectsSection({
   }) => void;
   showTemplates: boolean;
   setShowTemplates: (show: boolean) => void;
-  handleSelectTemplate: (template: any) => void;
+  handleSelectTemplate: (template: GoalTemplate) => void;
   handleSkipTemplate: () => void;
 }) {
   return (
@@ -513,7 +513,7 @@ export default function Dashboard() {
   }>({});
 
   // Template handlers
-  const handleSelectTemplate = (template: any) => {
+  const handleSelectTemplate = (template: GoalTemplate) => {
     setProjectName(template.name);
     setProjectDescription(template.description);
     setShowTemplates(false);
@@ -623,7 +623,10 @@ export default function Dashboard() {
             Please sign in to access your accountability dashboard.
           </p>
           <SignInButton mode="modal">
-            <button className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+            <button
+              className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              type="button"
+            >
               Sign In
             </button>
           </SignInButton>

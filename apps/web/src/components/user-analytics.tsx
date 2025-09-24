@@ -19,6 +19,9 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// Constants for skeleton loading
+const LOADING_SKELETON_COUNT = 6;
+
 export function UserAnalytics() {
   const analytics = useQuery(api.analytics.getUserAnalytics);
 
@@ -31,8 +34,10 @@ export function UserAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div className="space-y-2" key={i}>
+            {Array.from({ length: LOADING_SKELETON_COUNT }, (_, i) => ({
+              id: `user-skeleton-${i}`,
+            })).map((item) => (
+              <div className="space-y-2" key={item.id}>
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-8 w-12" />
               </div>

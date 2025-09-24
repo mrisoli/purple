@@ -17,19 +17,22 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-interface GoalTemplate {
+// Constants for template examples display
+const MAX_EXAMPLES_DISPLAY = 3;
+
+export type GoalTemplate = {
   id: string;
   name: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   category: 'health' | 'learning' | 'career' | 'finance' | 'personal';
   examples: string[];
-}
+};
 
-interface GoalTemplatesProps {
+type GoalTemplatesProps = {
   onSelectTemplate: (template: GoalTemplate) => void;
   onSkip: () => void;
-}
+};
 
 const templates: GoalTemplate[] = [
   {
@@ -152,12 +155,14 @@ export function GoalTemplates({
                 <div className="space-y-1">
                   <p className="font-medium text-sm">Examples:</p>
                   <ul className="space-y-1 text-muted-foreground text-xs">
-                    {template.examples.slice(0, 3).map((example, index) => (
-                      <li className="flex items-center gap-1" key={index}>
-                        <span className="h-1 w-1 rounded-full bg-current" />
-                        {example}
-                      </li>
-                    ))}
+                    {template.examples
+                      .slice(0, MAX_EXAMPLES_DISPLAY)
+                      .map((example) => (
+                        <li className="flex items-center gap-1" key={example}>
+                          <span className="h-1 w-1 rounded-full bg-current" />
+                          {example}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               </CardContent>

@@ -1,6 +1,9 @@
 'use client';
 
-interface ProgressRingProps {
+// Constants for progress calculations
+const PERCENTAGE_MULTIPLIER = 100;
+
+type ProgressRingProps = {
   progress: number; // 0-100
   size?: number; // default 120
   strokeWidth?: number; // default 8
@@ -8,7 +11,7 @@ interface ProgressRingProps {
   showLabel?: boolean;
   label?: string;
   color?: string;
-}
+};
 
 export function ProgressRing({
   progress,
@@ -21,13 +24,17 @@ export function ProgressRing({
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
+  const offset =
+    circumference - (progress / PERCENTAGE_MULTIPLIER) * circumference;
 
   return (
     <div
       className={`relative inline-flex items-center justify-center ${className}`}
     >
       <svg className="-rotate-90 transform" height={size} width={size}>
+        <title>
+          Progress indicator showing {Math.round(progress)}% completion
+        </title>
         {/* Background circle */}
         <circle
           cx={size / 2}

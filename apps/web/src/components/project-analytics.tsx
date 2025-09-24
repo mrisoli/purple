@@ -21,9 +21,24 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface ProjectAnalyticsProps {
-  projectId: Id<'projects'>;
+// Constants for analytics thresholds and display
+const HIGH_COMPLETION_THRESHOLD = 75;
+const MEDIUM_COMPLETION_THRESHOLD = 50;
+const LOADING_SKELETON_COUNT = 4;
+
+function getCompletionColor(completionRate: number): string {
+  if (completionRate >= HIGH_COMPLETION_THRESHOLD) {
+    return 'hsl(142, 76%, 36%)';
+  }
+  if (completionRate >= MEDIUM_COMPLETION_THRESHOLD) {
+    return 'hsl(48, 96%, 53%)';
+  }
+  return 'hsl(220, 14%, 96%)';
 }
+
+type ProjectAnalyticsProps = {
+  projectId: Id<'projects'>;
+};
 
 export function ProjectAnalytics({ projectId }: ProjectAnalyticsProps) {
   const analytics = useQuery(api.analytics.getProjectAnalytics, { projectId });
@@ -31,8 +46,10 @@ export function ProjectAnalytics({ projectId }: ProjectAnalyticsProps) {
   if (!analytics) {
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
+        {Array.from({ length: LOADING_SKELETON_COUNT }, (_, i) => ({
+          id: `project-skeleton-${i}`,
+        })).map((item) => (
+          <Card key={item.id}>
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-16" />
             </CardHeader>
@@ -130,13 +147,7 @@ export function ProjectAnalytics({ projectId }: ProjectAnalyticsProps) {
           </CardHeader>
           <CardContent className="flex items-center justify-center py-8">
             <ProgressRing
-              color={
-                analytics.completionRate >= 75
-                  ? 'hsl(142, 76%, 36%)'
-                  : analytics.completionRate >= 50
-                    ? 'hsl(48, 96%, 53%)'
-                    : 'hsl(220, 14%, 96%)'
-              }
+              color={getCompletionColor(analytics.completionRate)}
               label="Completed"
               progress={analytics.completionRate}
               size={140}
