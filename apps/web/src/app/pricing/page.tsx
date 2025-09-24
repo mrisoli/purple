@@ -21,9 +21,9 @@ const renderButton = (
   if (buttonText === 'Get Started Free') {
     return (
       <SignUpButton mode="modal">
-        <Button className="w-full" size="lg" variant="outline">
+        <span className="inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 font-medium text-sm ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer">
           {buttonText}
-        </Button>
+        </span>
       </SignUpButton>
     );
   }
@@ -335,10 +335,10 @@ export default function PricingPage() {
             </Authenticated>
             <Unauthenticated>
               <SignUpButton mode="modal">
-                <Button size="lg">
+                <span className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer">
                   Start Your First Project
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                </span>
               </SignUpButton>
               <Button asChild size="lg" variant="outline">
                 <Link href="/about">Learn More</Link>
