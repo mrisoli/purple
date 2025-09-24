@@ -71,6 +71,11 @@ type DashboardContentProps = {
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
   formErrors: { projectName?: string; projectDescription?: string };
+  setFormErrors: (errors: { projectName?: string; projectDescription?: string }) => void;
+  showTemplates: boolean;
+  setShowTemplates: (show: boolean) => void;
+  handleSelectTemplate: (template: any) => void;
+  handleSkipTemplate: () => void;
 };
 
 // Helper components to reduce complexity
@@ -174,6 +179,11 @@ function ProjectsSection({
   projectDescription,
   setProjectDescription,
   formErrors,
+  setFormErrors,
+  showTemplates,
+  setShowTemplates,
+  handleSelectTemplate,
+  handleSkipTemplate,
 }: {
   projects: Project[] | undefined;
   showCreateForm: boolean;
@@ -184,6 +194,11 @@ function ProjectsSection({
   projectDescription: string;
   setProjectDescription: (desc: string) => void;
   formErrors: { projectName?: string; projectDescription?: string };
+  setFormErrors: (errors: { projectName?: string; projectDescription?: string }) => void;
+  showTemplates: boolean;
+  setShowTemplates: (show: boolean) => void;
+  handleSelectTemplate: (template: any) => void;
+  handleSkipTemplate: () => void;
 }) {
   return (
     <div>
@@ -433,6 +448,11 @@ function DashboardContent({
   projectDescription,
   setProjectDescription,
   formErrors,
+  setFormErrors,
+  showTemplates,
+  setShowTemplates,
+  handleSelectTemplate,
+  handleSkipTemplate,
 }: DashboardContentProps) {
   const stats = {
     totalProjects: projects?.length || 0,
@@ -453,14 +473,19 @@ function DashboardContent({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <ProjectsSection
           formErrors={formErrors}
+          handleSelectTemplate={handleSelectTemplate}
+          handleSkipTemplate={handleSkipTemplate}
           onCreateProject={onCreateProject}
           projectDescription={projectDescription}
           projectName={projectName}
           projects={projects}
+          setFormErrors={setFormErrors}
           setProjectDescription={setProjectDescription}
           setProjectName={setProjectName}
           setShowCreateForm={setShowCreateForm}
+          setShowTemplates={setShowTemplates}
           showCreateForm={showCreateForm}
+          showTemplates={showTemplates}
         />
         <RecentActivitySection recentActions={recentActions} />
       </div>
@@ -568,15 +593,20 @@ export default function Dashboard() {
         <DashboardContent
           currentUser={currentUser}
           formErrors={formErrors}
+          handleSelectTemplate={handleSelectTemplate}
+          handleSkipTemplate={handleSkipTemplate}
           onCreateProject={handleCreateProject}
           projectDescription={projectDescription}
           projectName={projectName}
           projects={projects}
           recentActions={recentActions}
+          setFormErrors={setFormErrors}
           setProjectDescription={setProjectDescription}
           setProjectName={handleProjectNameChange}
           setShowCreateForm={setShowCreateForm}
+          setShowTemplates={setShowTemplates}
           showCreateForm={showCreateForm}
+          showTemplates={showTemplates}
           user={user}
         />
       </Authenticated>
