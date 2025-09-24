@@ -1,6 +1,15 @@
 import { v } from 'convex/values';
 import { query } from './_generated/server';
 
+// Time constants
+const HOURS_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_MINUTE = 60;
+const MILLISECONDS_PER_SECOND = 1000;
+const MILLISECONDS_PER_DAY = HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+const DAYS_IN_WEEK = 7;
+const PERCENTAGE_MULTIPLIER = 100;
+
 export const getProjectAnalytics = query({
   args: {
     projectId: v.id('projects'),
@@ -51,13 +60,13 @@ export const getProjectAnalytics = query({
 
     // Calculate engagement metrics
     const daysSinceCreation = Math.floor(
-      (Date.now() - project.createdAt) / (1000 * 60 * 60 * 24)
+      (Date.now() - project.createdAt) / MILLISECONDS_PER_DAY
     );
     const avgActionsPerDay =
       daysSinceCreation > 0 ? totalActions / daysSinceCreation : 0;
 
     // Recent activity (last 7 days)
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const sevenDaysAgo = Date.now() - DAYS_IN_WEEK * MILLISECONDS_PER_DAY;
     const recentActions = actions.filter(
       (a) => a.createdAt > sevenDaysAgo
     ).length;
@@ -70,16 +79,18 @@ export const getProjectAnalytics = query({
 
     let currentStreak = 0;
     const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
+    const yesterday = new Date(
+      Date.now() - MILLISECONDS_PER_DAY
+    ).toDateString();
 
     if (actionDates.includes(today) || actionDates.includes(yesterday)) {
       let checkDate = actionDates.includes(today)
         ? new Date()
-        : new Date(Date.now() - 24 * 60 * 60 * 1000);
+        : new Date(Date.now() - MILLISECONDS_PER_DAY);
 
       while (actionDates.includes(checkDate.toDateString())) {
         currentStreak++;
-        checkDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+        checkDate = new Date(checkDate.getTime() - MILLISECONDS_PER_DAY);
       }
     }
 
@@ -95,7 +106,12 @@ export const getProjectAnalytics = query({
       currentStreak,
       completionRate:
         totalActions > 0
-          ? Number(((milestoneReached / totalActions) * 100).toFixed(1))
+          ? Number(
+              (
+                (milestoneReached / totalActions) *
+                PERCENTAGE_MULTIPLIER
+              ).toFixed(1)
+            )
           : 0,
     };
   },
@@ -124,7 +140,7 @@ export const getUserAnalytics = query({
       .collect();
 
     // Get all actions across all projects
-    const allActions = [];
+    const allActions: { createdAt: number; type: string }[] = [];
     for (const project of projects) {
       const actions = await ctx.db
         .query('actions')
@@ -141,11 +157,11 @@ export const getUserAnalytics = query({
     ).length;
 
     // Most active day of week
-    const dayActions = Array(7).fill(0);
-    allActions.forEach((action) => {
+    const dayActions = new Array(DAYS_IN_WEEK).fill(0);
+    for (const action of allActions) {
       const dayOfWeek = new Date(action.createdAt).getDay();
       dayActions[dayOfWeek]++;
-    });
+    }
 
     const dayNames = [
       'Sunday',
@@ -169,7 +185,12 @@ export const getUserAnalytics = query({
           : 0,
       buddyMatchRate:
         totalProjects > 0
-          ? Number(((projectsWithBuddy / totalProjects) * 100).toFixed(1))
+          ? Number(
+              (
+                (projectsWithBuddy / totalProjects) *
+                PERCENTAGE_MULTIPLIER
+              ).toFixed(1)
+            )
           : 0,
       mostActiveDay,
     };

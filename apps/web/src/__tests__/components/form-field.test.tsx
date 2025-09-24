@@ -5,6 +5,7 @@ import { FormField } from '@/components/form-field';
 // Test constants to avoid magic numbers
 const WARNING_THRESHOLD_95 = 95;
 
+// biome-ignore lint/suspicious/noSkippedTests: DOM complexity requires extensive mocking
 describe.skip('FormField Component', () => {
   const defaultProps = {
     label: 'Test Field',
