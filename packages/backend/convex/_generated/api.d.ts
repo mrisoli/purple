@@ -14,10 +14,11 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as actions from "../actions.js";
-import type * as health_check from "../health_check.js";
-import type * as private_data from "../private_data.js";
+import type * as analytics from "../analytics.js";
+import type * as healthCheck from "../healthCheck.js";
+import type * as privateData from "../privateData.js";
 import type * as projects from "../projects.js";
-import type * as projects_admin from "../projects_admin.js";
+import type * as projectsAdmin from "../projectsAdmin.js";
 import type * as stripe from "../stripe.js";
 import type * as users from "../users.js";
 
@@ -31,10 +32,11 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   actions: typeof actions;
-  health_check: typeof health_check;
-  private_data: typeof private_data;
+  analytics: typeof analytics;
+  healthCheck: typeof healthCheck;
+  privateData: typeof privateData;
   projects: typeof projects;
-  projects_admin: typeof projects_admin;
+  projectsAdmin: typeof projectsAdmin;
   stripe: typeof stripe;
   users: typeof users;
 }>;

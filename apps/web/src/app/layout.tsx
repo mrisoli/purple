@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '../index.css';
-import { ClerkProvider } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
@@ -33,15 +32,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider>
-          <Providers>
-            <SkipLink />
-            <div className="grid h-svh grid-rows-[auto_1fr]">
-              <Header />
-              <main id="main-content">{children}</main>
-            </div>
-          </Providers>
-        </ClerkProvider>
+        <Providers>
+          <SkipLink />
+          <div className="grid h-svh grid-rows-[auto_1fr]">
+            <Header />
+            <main id="main-content">{children}</main>
+          </div>
+        </Providers>
         <Analytics />
       </body>
     </html>
